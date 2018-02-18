@@ -120,8 +120,9 @@ def __main__():
 			exec ('print (' + v[0] + ')')
 
 
-			print("val_ders:")
-			for i in val_ders:
-				print(i)
+		print("val_ders:")
+		for i in val_ders:
+			print(i)
+		val_ders=[]
 
 __main__()
