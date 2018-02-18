@@ -16,7 +16,8 @@ class Input:
 	value_list = []
 
 	def __init__(self):
-		pass
+		self.vars = []
+		self.value_list = []
 
 class Valder:
 	name = ''
@@ -81,8 +82,6 @@ def __main__():
 	print(variables)
 	print(inputs)
 	print(output)
-	#jacobian = [][]
-	jacobian = []
 	val_ders = []	#list of: ['var_name','value',[['derivativeToX',val],'derivativeToY',val],...]] #leafs #forwardPass
 	vds = {}
 	for i in inputs.value_list:
@@ -121,28 +120,14 @@ def __main__():
 				print("i see operations you did not handle!! like: "+v[1])
 			vds[v[0]] = vd
 
+		print("val_ders:")
+		for i in val_ders:
+			print(i)
+		val_ders=[]
+
 		for key, value in vds.items():
 			print (key + ' ' + str(value.val) + ' ' + str(value.der) + '\n')
 
-		vdslen = len(vds)
-		jacobian = np.zeros((vdslen, vdslen)) - np.identity(vdslen)
-
-		vd_list = list(vds.values())
-		for v in vd_list:
-			for i in v.der:
-				jacobian[vd_list.index(vds[i[0]])][vd_list.index(v)] = i[1]
-
-		print(str(jacobian))
-
-		y = np.zeros(vdslen)
-
-		y[vdslen - 1] = -1
-
-		x = np.linalg.solve(jacobian, y)
-
-		print(x)
-
 		vds = {}
-
 
 __main__()
