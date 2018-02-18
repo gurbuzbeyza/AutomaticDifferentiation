@@ -1,0 +1,9 @@
+input x_1
+input x_2
+output f
+t_0 = mult 2 x_1
+t_1 = sin  t_0
+t_2 = mult x_1 x_2
+t_3 = cos t_2
+t_4 = mult t_1 t_3
+f   = t_4
