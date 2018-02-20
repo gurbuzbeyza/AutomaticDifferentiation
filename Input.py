@@ -2,13 +2,18 @@ from enum import Enum
 from math import *
 import numpy as np
 
-NO_OPERATION = 'no operation'
+jacobian = []
+vds = {}
 
 class Operation(Enum):
 	Mult = 'mult'
 	Sin = 'sin'
 	Cos = 'cos'
 	Log = 'log'
+	Add = 'add'
+	Subs = 'subs'
+	Divide = 'divide'
+	NoOp = 'no_operation'
 	#add...
 
 class Input:
@@ -16,7 +21,8 @@ class Input:
 	value_list = []
 
 	def __init__(self):
-		pass
+		self.vars = []
+		self.value_list = []
 
 class Valder:
 	name = ''
@@ -27,6 +33,16 @@ class Valder:
 		self.name = name
 		self.val = 0
 		self.der = []
+
+class Variable:
+	name = ''
+	operation = ''
+	dependent_vars = []
+
+	def __init__(self, name, operation, dependent_vars):
+		self.name = name
+		self.operation = operation
+		self.dependent_vars = dependent_vars
 
 def take_input():
 	with open('function_def.txt') as f:
@@ -47,9 +63,9 @@ def take_input():
 			output = l[1]
 		else:
 			if(l[2] in operations):
-				variables.append([l[0],Operation(l[2]),l[3:]])	#[varName, operName, [variables]]
+				variables.append(Variable(l[0], Operation(l[2]), l[3:]))	#[varName, operName, [variables]]
 			else:
-				variables.append([l[0],NO_OPERATION,l[2:]])	#[varName, operName, [variables]]
+				variables.append(Variable(l[0], Operation.NoOp, l[2:]))	#[varName, operName, [variables]]
 	i = input_vals[0].split()
 	n = len(i)
 	for x in i:
@@ -61,13 +77,71 @@ def take_input():
 		inputs.value_list.append(i)
 	return variables, inputs, output
 
-# def choose_operation(op, v):
-#     return {
-#         Operation.Mult: exec (v[0] + ' = ' + v[2][0] + ' * ' + v[2][1]),
-#         Operation.Sin: exec (v[0] + ' = ' + 'sin(' + v[2][1] + ')'),
-#         Operation.Cos: exec (v[0] + ' = ' + 'cos(' + v[2][1] + ')'),
-#         Operation.Log: exec (v[0] + ' = ' + 'log(' + v[2][1] + ')')
-#     }[op]
+def choose_operation(op, v, vd):
+	if v.operation == Operation.Mult:
+		mult_valder(vd, v.dependent_vars[0], v.dependent_vars[1])
+	elif v.operation == Operation.Sin:
+		sin_valder(vd, v.dependent_vars[0])
+	elif v.operation == Operation.Cos:
+		cos_valder(vd, v.dependent_vars[0])
+	elif v.operation == Operation.Log:
+		log_valder(vd, v.dependent_vars[0])
+	elif v.operation == Operation.NoOp:
+		noop_valder(vd, v.dependent_vars[0])
+	else:
+		print("i see operations you did not handle!! like: "+str(v.operation))
+   
+
+def mult_valder(vd, x1, x2):
+	if not isScalar(x1) and not isScalar(x2):
+		vd.val = vds[x1].val * vds[x2].val
+		vd.der.append((x1,vds[x2].val))
+		vd.der.append((x2,vds[x1].val))
+	elif not isScalar(x1):
+		vd.val = vds[x1].val * float(x2)
+		vd.der.append((x1,float(x2)))
+	elif not isScalar(x2):
+		vd.val = float(x1) * vds[x2].val
+		vd.der.append((x2,float(x1)))
+	else:	#not expected
+		print("multiplication of 2 scalars given! should i handle it?")
+
+def sin_valder(vd, x):
+	vd.val = sin(vds[x].val)
+	vd.der.append((x,cos(vds[x].val)))
+
+def cos_valder(vd, x):
+	vd.val = cos(vds[x].val)
+	vd.der.append((x,-sin(vds[x].val)))
+
+def log_valder(vd, x):
+	vd.val = log(vds[x].val)
+	vd.der.append((x,1/(vds[x].val)))
+
+def noop_valder(vd, x):
+	vd.val = vds[x].val
+	vd.der.append((x,1))
+
+def solve_lin_eq():
+	global vds
+	vdslen = len(vds)
+	jacobian = np.zeros((vdslen, vdslen)) - np.identity(vdslen)
+
+	vd_list = list(vds.values())
+	for v in vd_list:
+		for i in v.der:
+			jacobian[vd_list.index(vds[i[0]])][vd_list.index(v)] = i[1]
+
+	# print(str(jacobian))
+
+	y = np.zeros(vdslen)
+
+	y[vdslen - 1] = -1
+
+	x = np.linalg.solve(jacobian, y)
+
+	return x
+
 
 def isScalar(n):
 	try:
@@ -77,14 +151,11 @@ def isScalar(n):
 		return False
 
 def __main__():
+	global vds
 	variables, inputs, output = take_input()
-	print(variables)
-	print(inputs)
-	print(output)
-	#jacobian = [][]
-	jacobian = []
-	val_ders = []	#list of: ['var_name','value',[['derivativeToX',val],'derivativeToY',val],...]] #leafs #forwardPass
-	vds = {}
+	# print(variables)
+	# print(inputs)
+	# print(output)
 	for i in inputs.value_list:
 		for j in range(len(inputs.vars)):
 			vd = Valder(inputs.vars[j])
@@ -92,55 +163,17 @@ def __main__():
 			vd.der.append((inputs.vars[j], -1))
 			vds[inputs.vars[j]] = vd
 		for v in variables:
-			valder = [0,0,[]]#placeholder	#['var_name','value','derivative']
 			#!!note:!! execs below might be insufficient execute more(? :D) if errors occur
-			vd = Valder(v[0])
-			if v[1] == Operation.Mult:
-				if not isScalar(v[2][0]) and not isScalar(v[2][1]):
-					vd.val = vds[v[2][0]].val * vds[v[2][1]].val
-					vd.der.append((v[2][0],vds[v[2][1]].val))
-					vd.der.append((v[2][1],vds[v[2][0]].val))
-				elif not isScalar(v[2][0]):
-					vd.val = vds[v[2][0]].val * float(v[2][1])
-					vd.der.append((v[2][0],float(v[2][1])))
-				elif not isScalar(v[2][1]):
-					vd.val = float(v[2][0]) * vds[v[2][1]].val
-					vd.der.append((v[2][1],float(v[2][0])))
-				else:	#not expected
-					print("multiplication of 2 scalars given! should i handle it?")
-			elif v[1] == Operation.Sin:
-				vd.val = sin(vds[v[2][0]].val)
-				vd.der.append((v[2][0],cos(vds[v[2][0]].val)))
-			elif v[1] == Operation.Cos:
-				vd.val = cos(vds[v[2][0]].val)
-				vd.der.append((v[2][0],-sin(vds[v[2][0]].val)))
-			elif v[1] == NO_OPERATION:
-				vd.val = vds[v[2][0]].val
-				vd.der.append((v[2][0],1))
-			else:
-				print("i see operations you did not handle!! like: "+v[1])
-			vds[v[0]] = vd
+			vd = Valder(v.name)
+			choose_operation(v.operation, v, vd)
+			vds[v.name] = vd
 
-		for key, value in vds.items():
-			print (key + ' ' + str(value.val) + ' ' + str(value.der) + '\n')
+		# for key, value in vds.items():
+		# 	print (key + ' ' + str(value.val) + ' ' + str(value.der) + '\n')
+		x = solve_lin_eq()
 
-		vdslen = len(vds)
-		jacobian = np.zeros((vdslen, vdslen)) - np.identity(vdslen)
-
-		vd_list = list(vds.values())
-		for v in vd_list:
-			for i in v.der:
-				jacobian[vd_list.index(vds[i[0]])][vd_list.index(v)] = i[1]
-
-		print(str(jacobian))
-
-		y = np.zeros(vdslen)
-
-		y[vdslen - 1] = -1
-
-		x = np.linalg.solve(jacobian, y)
-
-		print(x)
+		for j in range(len(inputs.vars)):
+			print(inputs.vars[j] + ': ' + str(x[j]))
 
 		vds = {}
 
