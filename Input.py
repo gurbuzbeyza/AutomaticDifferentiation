@@ -3,7 +3,7 @@ from mpmath import *
 import numpy as np
 
 jacobian = []
-vds = {}
+valders = {}
 
 class Operation(Enum):
 	Mult = 'mult'
@@ -81,116 +81,116 @@ def take_input():
 		inputs.value_list.append(i)
 	return variables, inputs, output
 
-def choose_operation(op, v, vd):
+def choose_operation(op, v, valder):
 	if v.operation == Operation.Mult:
-		mult_valder(vd, v.dependent_vars[0], v.dependent_vars[1])
+		mult_valder(valder, v.dependent_vars[0], v.dependent_vars[1])
 	elif v.operation == Operation.Sin:
-		sin_valder(vd, v.dependent_vars[0])
+		sin_valder(valder, v.dependent_vars[0])
 	elif v.operation == Operation.Cos:
-		cos_valder(vd, v.dependent_vars[0])
+		cos_valder(valder, v.dependent_vars[0])
 	elif v.operation == Operation.Log:
-		log_valder(vd, v.dependent_vars[0])
+		log_valder(valder, v.dependent_vars[0])
 	elif v.operation == Operation.Div:
-		div_valder(vd, v.dependent_vars[0], v.dependent_vars[1])
+		div_valder(valder, v.dependent_vars[0], v.dependent_vars[1])
 	elif v.operation == Operation.Pow:
-		pow_valder(vd, v.dependent_vars[0], v.dependent_vars[1])
+		pow_valder(valder, v.dependent_vars[0], v.dependent_vars[1])
 	elif v.operation == Operation.Tan:
-		tan_valder(vd, v.dependent_vars[0])
+		tan_valder(valder, v.dependent_vars[0])
 	elif v.operation == Operation.Cot:
-		cot_valder(vd, v.dependent_vars[0])
+		cot_valder(valder, v.dependent_vars[0])
 	elif v.operation == Operation.Exp:
-		exp_valder(vd, v.dependent_vars[0])
+		exp_valder(valder, v.dependent_vars[0])
 	elif v.operation == Operation.NoOp:
-		noop_valder(vd, v.dependent_vars[0])
+		noop_valder(valder, v.dependent_vars[0])
 	else:
 		print("i see operations you did not handle!! like: "+str(v.operation))
    
 
-def mult_valder(vd, x1, x2):
+def mult_valder(valder, x1, x2):
 	if not isScalar(x1) and not isScalar(x2):
-		vd.val = vds[x1].val * vds[x2].val
-		vd.der.append((x1,vds[x2].val))
-		vd.der.append((x2,vds[x1].val))
+		valder.val = valders[x1].val * valders[x2].val
+		valder.der.append((x1,valders[x2].val))
+		valder.der.append((x2,valders[x1].val))
 	elif not isScalar(x1):
-		vd.val = vds[x1].val * float(x2)
-		vd.der.append((x1,float(x2)))
+		valder.val = valders[x1].val * float(x2)
+		valder.der.append((x1,float(x2)))
 	elif not isScalar(x2):
-		vd.val = float(x1) * vds[x2].val
-		vd.der.append((x2,float(x1)))
+		valder.val = float(x1) * valders[x2].val
+		valder.der.append((x2,float(x1)))
 	else:	#not expected
 		print("multiplication of 2 scalars given! should i handle it?")
 
-def sin_valder(vd, x):
-	vd.val = sin(vds[x].val)
-	vd.der.append((x,cos(vds[x].val)))
+def sin_valder(valder, x):
+	valder.val = sin(valders[x].val)
+	valder.der.append((x,cos(valders[x].val)))
 
-def cos_valder(vd, x):
-	vd.val = cos(vds[x].val)
-	vd.der.append((x,-sin(vds[x].val)))
+def cos_valder(valder, x):
+	valder.val = cos(valders[x].val)
+	valder.der.append((x,-sin(valders[x].val)))
 
-def log_valder(vd, x):
-	vd.val = log(vds[x].val)
-	vd.der.append((x,1/(vds[x].val)))
+def log_valder(valder, x):
+	valder.val = log(valders[x].val)
+	valder.der.append((x,1/(valders[x].val)))
 
-def div_valder(vd, x1, x2):
+def div_valder(valder, x1, x2):
 	if not isScalar(x1) and not isScalar(x2):
-		vd.val = vds[x1].val / vds[x2].val
-		vd.der.append((x1,1/vds[x2].val))
-		vd.der.append((x2,(-vds[x1].val)/vds[x2].val**2))
+		valder.val = valders[x1].val / valders[x2].val
+		valder.der.append((x1,1/valders[x2].val))
+		valder.der.append((x2,(-valders[x1].val)/valders[x2].val**2))
 	elif not isScalar(x1):
-		vd.val = vds[x1].val / float(x2)
-		vd.der.append((x1,1/float(x2)))
+		valder.val = valders[x1].val / float(x2)
+		valder.der.append((x1,1/float(x2)))
 	elif not isScalar(x2):
-		vd.val = float(x1) * vds[x2].val
-		vd.der.append((x2,(-float(x1))/vds[x2].val**2))
+		valder.val = float(x1) * valders[x2].val
+		valder.der.append((x2,(-float(x1))/valders[x2].val**2))
 	else:	#not expected
 		print("division of 2 scalars given! should i handle it?")
 
-def pow_valder(vd, x1, x2):
+def pow_valder(valder, x1, x2):
 	if not isScalar(x1) and not isScalar(x2):
-		vd.val = vds[x1].val ** vds[x2].val
-		vd.der.append((x1,vds[x2].val*(vds[x1].val**(vds[x2].val-1))))
-		vd.der.append((x2,(vds[x1].val**vds[x2].val)*log(vds[x1].val)))
+		valder.val = valders[x1].val ** valders[x2].val
+		valder.der.append((x1,valders[x2].val*(valders[x1].val**(valders[x2].val-1))))
+		valder.der.append((x2,(valders[x1].val**valders[x2].val)*log(valders[x1].val)))
 	elif not isScalar(x1):
-		vd.val = vds[x1].val ** float(x2)
-		vd.der.append((x1,float(x2)*(vds[x1].val**float(x2-1))))
+		valder.val = valders[x1].val ** float(x2)
+		valder.der.append((x1,float(x2)*(valders[x1].val**float(x2-1))))
 	elif not isScalar(x2):
-		vd.val = float(x1) ** vds[x2].val
-		vd.der.append((x2,(float(x1) ** vds[x2].val)*log(float(x1))))
+		valder.val = float(x1) ** valders[x2].val
+		valder.der.append((x2,(float(x1) ** valders[x2].val)*log(float(x1))))
 	else:	#not expected
 		print("division of 2 scalars given! should i handle it?")
 
-def tan_valder(vd, x):
-	vd.val = tan(vds[x].val)
-	vd.der.append((x,1/((cos(vds[x].val))**2)))
+def tan_valder(valder, x):
+	valder.val = tan(valders[x].val)
+	valder.der.append((x,1/((cos(valders[x].val))**2)))
 
-def cot_valder(vd, x):
-	vd.val = cot(vds[x].val)
-	vd.der.append((x,-1/((sin(vds[x].val))**2)))
+def cot_valder(valder, x):
+	valder.val = cot(valders[x].val)
+	valder.der.append((x,-1/((sin(valders[x].val))**2)))
 
-def exp_valder(vd, x):
-	vd.val = e**(vds[x].val)
-	vd.der.append((x,e**(vds[x].val)))
+def exp_valder(valder, x):
+	valder.val = e**(valders[x].val)
+	valder.der.append((x,e**(valders[x].val)))
 
-def noop_valder(vd, x):
-	vd.val = vds[x].val
-	vd.der.append((x,1))
+def noop_valder(valder, x):
+	valder.val = valders[x].val
+	valder.der.append((x,1))
 
 def solve_lin_eq():
-	global vds
-	vdslen = len(vds)
-	jacobian = np.zeros((vdslen, vdslen)) - np.identity(vdslen)
+	global valders
+	valderslen = len(valders)
+	jacobian = np.zeros((valderslen, valderslen)) - np.identity(valderslen)
 
-	vd_list = list(vds.values())
-	for v in vd_list:
+	valder_list = list(valders.values())
+	for v in valder_list:
 		for i in v.der:
-			jacobian[vd_list.index(vds[i[0]])][vd_list.index(v)] = i[1]
+			jacobian[valder_list.index(valders[i[0]])][valder_list.index(v)] = i[1]
 
 	# print(str(jacobian))
 
-	y = np.zeros(vdslen)
+	y = np.zeros(valderslen)
 
-	y[vdslen - 1] = -1
+	y[valderslen - 1] = -1
 
 	x = np.linalg.solve(jacobian, y)
 
@@ -205,31 +205,31 @@ def isScalar(n):
 		return False
 
 def __main__():
-	global vds
+	global valders
 	variables, inputs, output = take_input()
 	# print(variables)
 	# print(inputs)
 	# print(output)
 	for i in inputs.value_list:
 		for j in range(len(inputs.vars)):
-			vd = Valder(inputs.vars[j])
-			vd.val = float(i[j])
-			vd.der.append((inputs.vars[j], -1))
-			vds[inputs.vars[j]] = vd
+			valder = Valder(inputs.vars[j])
+			valder.val = float(i[j])
+			valder.der.append((inputs.vars[j], -1))
+			valders[inputs.vars[j]] = valder
 		for v in variables:
 			#!!note:!! execs below might be insufficient execute more(? :D) if errors occur
-			vd = Valder(v.name)
-			choose_operation(v.operation, v, vd)
-			vds[v.name] = vd
+			valder = Valder(v.name)
+			choose_operation(v.operation, v, valder)
+			valders[v.name] = valder
 
-		# for key, value in vds.items():
+		# for key, value in valders.items():
 		# 	print (key + ' ' + str(value.val) + ' ' + str(value.der) + '\n')
 		x = solve_lin_eq()
 
 		for j in range(len(inputs.vars)):
 			print(inputs.vars[j] + ': ' + str(x[j]))
 
-		vds = {}
+		valders = {}
 
 
 __main__()
