@@ -11,13 +11,18 @@ class Operation(Enum):
 	Cos = 'cos'
 	Log = 'log'
 	Add = 'add'
-	Subs = 'subs'
+	Sub = 'sub'
 	Div = 'div'
-	NoOp = 'no_operation'
 	Pow = 'pow'
 	Tan = 'tan'
 	Cot = 'cot'
 	Exp = 'exp'
+	Sqrt = 'sqrt'
+	Asin = 'asin'
+	Acos = 'acos'
+	Atan = 'atan'
+	Acot = 'acot'
+	NoOp = 'no_operation'
 	#add...
 
 class Input:
@@ -100,6 +105,20 @@ def choose_operation(op, v, valder):
 		cot_valder(valder, v.dependent_vars[0])
 	elif v.operation == Operation.Exp:
 		exp_valder(valder, v.dependent_vars[0])
+	elif v.operation == Operation.Add:
+		add_valder(valder, v.dependent_vars[0], v.dependent_vars[1])
+	elif v.operation == Operation.Sub:
+		sub_valder(valder, v.dependent_vars[0], v.dependent_vars[1])
+	elif v.operation == Operation.Sqrt:
+		sqrt_valder(valder, v.dependent_vars[0])
+	elif v.operation == Operation.Sin:
+		asin_valder(valder, v.dependent_vars[0])
+	elif v.operation == Operation.Cos:
+		acos_valder(valder, v.dependent_vars[0])
+	elif v.operation == Operation.Tan:
+		atan_valder(valder, v.dependent_vars[0])
+	elif v.operation == Operation.Cot:
+		acot_valder(valder, v.dependent_vars[0])
 	elif v.operation == Operation.NoOp:
 		noop_valder(valder, v.dependent_vars[0])
 	else:
@@ -158,7 +177,7 @@ def pow_valder(valder, x1, x2):
 		valder.val = float(x1) ** valders[x2].val
 		valder.der.append((x2,(float(x1) ** valders[x2].val)*log(float(x1))))
 	else:	#not expected
-		print("division of 2 scalars given! should i handle it?")
+		print("power of 2 scalars given! should i handle it?")
 
 def tan_valder(valder, x):
 	valder.val = tan(valders[x].val)
@@ -171,6 +190,54 @@ def cot_valder(valder, x):
 def exp_valder(valder, x):
 	valder.val = e**(valders[x].val)
 	valder.der.append((x,e**(valders[x].val)))
+
+def add_valder(valder, x1, x2):
+	if not isScalar(x1) and not isScalar(x2):
+		valder.val = valders[x1].val + valders[x2].val
+		valder.der.append((x1,1))
+		valder.der.append((x2,1))
+	elif not isScalar(x1):
+		valder.val = valders[x1].val + float(x2)
+		valder.der.append((x1,1))
+	elif not isScalar(x2):
+		valder.val = float(x1) + valders[x2].val
+		valder.der.append((x2,1))
+	else:	#not expected
+		print("addition of 2 scalars given! should i handle it?")
+
+def sub_valder(valder, x1, x2):
+	if not isScalar(x1) and not isScalar(x2):
+		valder.val = valders[x1].val - valders[x2].val
+		valder.der.append((x1,1))
+		valder.der.append((x2,-1))
+	elif not isScalar(x1):
+		valder.val = valders[x1].val - float(x2)
+		valder.der.append((x1,1))
+	elif not isScalar(x2):
+		valder.val = float(x1) - valders[x2].val
+		valder.der.append((x2,-1))
+	else:	#not expected
+		print("subtraction of 2 scalars given! should i handle it?")
+
+def sqrt_valder(valder, x):
+	valder.val = sqrt(valders[x].val)
+	valder.der.append((x,1/2*sqrt(valders[x].val)))
+
+def asin_valder(valder, x):
+	valder.val = asin(valders[x].val)
+	valder.der.append((x,1/sqrt(1-valders[x].val**2)))
+
+def acos_valder(valder, x):
+	valder.val = acos(valders[x].val)
+	valder.der.append((x,-1/sqrt(1-valders[x].val**2)))
+
+def atan_valder(valder, x):
+	valder.val = atan(valders[x].val)
+	valder.der.append((x,1/(valders[x].val**2 + 1)))
+
+def acot_valder(valder, x):
+	valder.val = acot(valders[x].val)
+	valder.der.append((x,-1/(valders[x].val**2 + 1)))
 
 def noop_valder(valder, x):
 	valder.val = valders[x].val
@@ -185,8 +252,6 @@ def solve_lin_eq():
 	for v in valder_list:
 		for i in v.der:
 			jacobian[valder_list.index(valders[i[0]])][valder_list.index(v)] = i[1]
-
-	# print(str(jacobian))
 
 	y = np.zeros(valderslen)
 
@@ -203,6 +268,7 @@ def isScalar(n):
 		return True
 	except ValueError:
 		return False
+
 
 def __main__():
 	global valders
@@ -221,9 +287,7 @@ def __main__():
 			valder = Valder(v.name)
 			choose_operation(v.operation, v, valder)
 			valders[v.name] = valder
-
-		# for key, value in valders.items():
-		# 	print (key + ' ' + str(value.val) + ' ' + str(value.der) + '\n')
+		
 		x = solve_lin_eq()
 
 		for j in range(len(inputs.vars)):
