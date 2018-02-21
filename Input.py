@@ -1,5 +1,5 @@
 from enum import Enum
-from math import *
+from mpmath import *
 import numpy as np
 
 jacobian = []
@@ -12,8 +12,12 @@ class Operation(Enum):
 	Log = 'log'
 	Add = 'add'
 	Subs = 'subs'
-	Divide = 'divide'
+	Div = 'div'
 	NoOp = 'no_operation'
+	Pow = 'pow'
+	Tan = 'tan'
+	Cot = 'cot'
+	Exp = 'exp'
 	#add...
 
 class Input:
@@ -86,6 +90,16 @@ def choose_operation(op, v, vd):
 		cos_valder(vd, v.dependent_vars[0])
 	elif v.operation == Operation.Log:
 		log_valder(vd, v.dependent_vars[0])
+	elif v.operation == Operation.Div:
+		div_valder(vd, v.dependent_vars[0], v.dependent_vars[1])
+	elif v.operation == Operation.Pow:
+		pow_valder(vd, v.dependent_vars[0], v.dependent_vars[1])
+	elif v.operation == Operation.Tan:
+		tan_valder(vd, v.dependent_vars[0])
+	elif v.operation == Operation.Cot:
+		cot_valder(vd, v.dependent_vars[0])
+	elif v.operation == Operation.Exp:
+		exp_valder(vd, v.dependent_vars[0])
 	elif v.operation == Operation.NoOp:
 		noop_valder(vd, v.dependent_vars[0])
 	else:
@@ -117,6 +131,46 @@ def cos_valder(vd, x):
 def log_valder(vd, x):
 	vd.val = log(vds[x].val)
 	vd.der.append((x,1/(vds[x].val)))
+
+def div_valder(vd, x1, x2):
+	if not isScalar(x1) and not isScalar(x2):
+		vd.val = vds[x1].val / vds[x2].val
+		vd.der.append((x1,1/vds[x2].val))
+		vd.der.append((x2,(-vds[x1].val)/vds[x2].val**2))
+	elif not isScalar(x1):
+		vd.val = vds[x1].val / float(x2)
+		vd.der.append((x1,1/float(x2)))
+	elif not isScalar(x2):
+		vd.val = float(x1) * vds[x2].val
+		vd.der.append((x2,(-float(x1))/vds[x2].val**2))
+	else:	#not expected
+		print("division of 2 scalars given! should i handle it?")
+
+def pow_valder(vd, x1, x2):
+	if not isScalar(x1) and not isScalar(x2):
+		vd.val = vds[x1].val ** vds[x2].val
+		vd.der.append((x1,vds[x2].val*(vds[x1].val**(vds[x2].val-1))))
+		vd.der.append((x2,(vds[x1].val**vds[x2].val)*log(vds[x1].val)))
+	elif not isScalar(x1):
+		vd.val = vds[x1].val ** float(x2)
+		vd.der.append((x1,float(x2)*(vds[x1].val**float(x2-1))))
+	elif not isScalar(x2):
+		vd.val = float(x1) ** vds[x2].val
+		vd.der.append((x2,(float(x1) ** vds[x2].val)*log(float(x1))))
+	else:	#not expected
+		print("division of 2 scalars given! should i handle it?")
+
+def tan_valder(vd, x):
+	vd.val = tan(vds[x].val)
+	vd.der.append((x,1/((cos(vds[x].val))**2)))
+
+def cot_valder(vd, x):
+	vd.val = cot(vds[x].val)
+	vd.der.append((x,-1/((sin(vds[x].val))**2)))
+
+def exp_valder(vd, x):
+	vd.val = e**(vds[x].val)
+	vd.der.append((x,e**(vds[x].val)))
 
 def noop_valder(vd, x):
 	vd.val = vds[x].val
