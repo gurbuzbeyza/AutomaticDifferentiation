@@ -127,9 +127,13 @@ def choose_operation(op, v, valder):
 
 def mult_valder(valder, x1, x2):
 	if not isScalar(x1) and not isScalar(x2):
-		valder.val = valders[x1].val * valders[x2].val
-		valder.der.append((x1,valders[x2].val))
-		valder.der.append((x2,valders[x1].val))
+		if x1 == x2:
+			valder.val = valders[x1].val**2
+			valder.der.append((x1,valders[x1].val*2));
+		else:
+			valder.val = valders[x1].val * valders[x2].val
+			valder.der.append((x1,valders[x2].val))
+			valder.der.append((x2,valders[x1].val))
 	elif not isScalar(x1):
 		valder.val = valders[x1].val * float(x2)
 		valder.der.append((x1,float(x2)))
@@ -194,8 +198,11 @@ def exp_valder(valder, x):
 def add_valder(valder, x1, x2):
 	if not isScalar(x1) and not isScalar(x2):
 		valder.val = valders[x1].val + valders[x2].val
-		valder.der.append((x1,1))
-		valder.der.append((x2,1))
+		if x1 == x2:
+			valder.der.append((x1,2)) 
+		else:
+			valder.der.append((x1,1))
+			valder.der.append((x2,1))
 	elif not isScalar(x1):
 		valder.val = valders[x1].val + float(x2)
 		valder.der.append((x1,1))
@@ -207,9 +214,13 @@ def add_valder(valder, x1, x2):
 
 def sub_valder(valder, x1, x2):
 	if not isScalar(x1) and not isScalar(x2):
-		valder.val = valders[x1].val - valders[x2].val
-		valder.der.append((x1,1))
-		valder.der.append((x2,-1))
+		if x1==x2:
+			valder.val = 0
+			valder.der.append((x1,0))
+		else:
+			valder.val = valders[x1].val - valders[x2].val
+			valder.der.append((x1,1))
+			valder.der.append((x2,-1))
 	elif not isScalar(x1):
 		valder.val = valders[x1].val - float(x2)
 		valder.der.append((x1,1))
