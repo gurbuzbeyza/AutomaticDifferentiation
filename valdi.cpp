@@ -2,20 +2,11 @@
 #include <string>
 #include <vector>
 #include <tuple>
+#include <math.h>
 //http://www.cplusplus.com/reference/tuple/tuple/
 
 using namespace std;
 
-/*float arr[4];
-arr[0] = 6.28;
-arr[1] = 2.50;
-arr[2] = 9.73;
-arr[3] = 4.364;
-std::vector<float*> vec = std::vector<float*>();
-vec.push_back(arr);
-float* ptr = vec.front();
-for (int i = 0; i < 3; i++)
-    printf("%g\n", ptr[i]);*/
 class Valder {
 
         public:
@@ -32,18 +23,14 @@ class Valder {
                 {
                         return ders;
                 }
-                void DisplayDerValuesDummy()
+                void DisplayDerValues()
                 {
                         for( unsigned int i = 0; i < ders.size(); i++ )
                         {
-                                cout << "Element[" << i << "] = " << std::get<0>(ders[i]).getName() << " of der is: " << std::get<1>(ders[i]) << endl;
+                            cout<<"derivative to "<<std::get<0>(ders[i]).getName()<< " is: " << std::get<1>(ders[i]) << endl;
                         }
                         cout << endl;
                 }
-
-                /*Valder::Valder(void){
-                        cout<<"valder object created"<<endl;
-                }*/ //??
 
                 void setName(string s){
                         name = s;
@@ -60,12 +47,22 @@ class Valder {
                 float getVal(void){
                         return val;
                 }
-                // Overload + operator to add two Box objects.
+                // Overload + operator to add two Valder objects.
                 Valder operator+(Valder b) {
                     Valder vd;
                     vd.val = this->val + b.val;
-                    vd.AddDer(b,b.getVal());
-                    //vd.AddDer(this,this->getVal());   //need to uncomment this line but gives error
+                    vd.AddDer(b,1);
+                    vd.AddDer(*this,1);
+                    vd.setName("deleteNameField");
+                    return vd;
+               }
+
+               // Overload * operator to multiply two Valder objects.
+                Valder operator*(Valder b) {
+                    Valder vd;
+                    vd.val = this->val * b.val;
+                    vd.AddDer(b,this->val);
+                    vd.AddDer(*this,b.getVal());
                     vd.setName("deleteNameField");
                     return vd;
                }
@@ -77,19 +74,44 @@ class Valder {
 
 };
 
+Valder sin(Valder var) {
+    Valder v;
+    v.setName("sinResult");
+    v.setVal(var.getVal());
+    v.AddDer(var,cos(var.getVal()));
+    cout << "Sin result added" << endl;
+    return v;
+}
+
+Valder cos(Valder var) {
+    Valder v;
+    v.setName("cosResult");
+    v.setVal(var.getVal());
+    v.AddDer(var,(-1)*sin(var.getVal()));
+    cout << "Cos result added" << endl;
+    return v;
+}
 
 
 int main() {
-    Valder vd;
-    Valder vd2;
-    Valder vdres;
-    vd.setName("vd");
-    vd2.setName("vd2");
-    vd.setVal(1);
-    vd2.setVal(2);
-    vd.AddDer(vd2,3);
-    vd.DisplayDerValuesDummy();
-    vdres = vd+vd2;
-    vdres.DisplayDerValuesDummy();
+    Valder a;
+    Valder b;
+    Valder result;
+    a.setName("a");
+    b.setName("b");
+    a.setVal(1);
+    b.setVal(2);
+    cout<<"a: "<<endl;
+    a.DisplayDerValues();
+    result =sin(a);
+    cout<<"result: "<<endl;
+    result.DisplayDerValues();
+
     return 0;
 }
+
+
+
+//https://www.tutorialspoint.com/cplusplus/cpp_overloading.htm -> add many on the list, like unary (-)
+
+//http://warp.povusers.org/FunctionParser/  -> warping in c++
