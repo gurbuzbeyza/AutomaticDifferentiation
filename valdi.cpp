@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <list>
 #include <tuple>
 #include <math.h>
 //http://www.cplusplus.com/reference/tuple/tuple/
@@ -51,6 +52,10 @@ class Valder {
                 float getVal(void){
                         return val;
                 }
+
+                /*Valder operator=(Valder b){
+                    //add dep
+                }*/
                 // Overload + operator to add two Valder objects.
                 Valder operator+(Valder b) {
                     Valder vd;
@@ -87,10 +92,12 @@ class Valder {
                     v.AddDer(*this,1/b.getVal());
                     v.setName("div result");
                     return v;
-                }         
+                }
 
         private:
+            //we should really revise the structure.
                 std::vector<tuple<Valder,float>> ders;
+                list<Valder> deps;//overrite = to add dependency to list, this will help to construct graph
                 string name;
                 float val;
 
@@ -102,7 +109,7 @@ Valder pow(Valder var,Valder p){
     v.setVal(pow(var.getVal(),p.getVal()));
     v.AddDer(var,p.getVal()*(pow(var.getVal(),p.getVal()-1)));
     v.AddDer(p,pow(var.getVal(),p.getVal())*log(var.getVal()));
-    return v;   
+    return v;
 }
 
 Valder sqrt(Valder var){
@@ -141,14 +148,14 @@ Valder tan(Valder var){
     return v;
 }
 
-Valder asin(Valder var){    
+Valder asin(Valder var){
     Valder v;
     v.setName("asinresult");
     v.setVal(asin(var.getVal()));
     v.AddDer(var,1/sqrt(1-pow(var.getVal(),2)));
     return v;
 }
-Valder acos(Valder var){    
+Valder acos(Valder var){
     Valder v;
     v.setName("acosresult");
     v.setVal(acos(var.getVal()));
@@ -156,7 +163,7 @@ Valder acos(Valder var){
     return v;
 }
 
-Valder atan(Valder var){    
+Valder atan(Valder var){
     Valder v;
     v.setName("atanresult");
     v.setVal(atan(var.getVal()));
@@ -181,7 +188,7 @@ Valder log(Valder var){
 
 /*//template
 
-Valder Z(Valder var){    
+Valder Z(Valder var){
     Valder v;
     v.setName("Zresult");
     v.setVal(Z(var.getVal()));
@@ -191,7 +198,7 @@ Valder Z(Valder var){
 
 
 int main() {
-    
+
     /// just try some stuff
     Valder a;
     Valder b;
