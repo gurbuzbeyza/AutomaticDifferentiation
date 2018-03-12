@@ -11,6 +11,18 @@
 //TODO implement = overloading to pass by reference and to assign floats to valders at initialization.
 using namespace std;
 
+enum Operation { Sin,Cos,Sum,Div,Mult,Sub,Acos,Asin,Atan};
+/*Days day = Saturday;
+if(day == Saturday){
+    std::cout<<"Ok its Saturday";
+}*/
+struct Node
+{
+    Operation o;
+    Valder v1;
+    Valder v2=NULL;
+}Node;
+
 class Valder {
 
         public:
@@ -18,14 +30,14 @@ class Valder {
                 {}
                 ~Valder()
                 {}
+                std::vector<tuple<Valder,float>> GetCopyOfVector()
+                {
+                        return ders;
+                }
                 void AddDer(Valder derOf,float der)
                 {
                 tuple<Valder,float> tpl_der (derOf,der);
                     ders.push_back(tpl_der);
-                }
-                std::vector<tuple<Valder,float>> GetCopyOfVector()
-                {
-                        return ders;
                 }
                 void DisplayDerValues()
                 {
@@ -53,6 +65,14 @@ class Valder {
                         return val;
                 }
 
+                void setNode(Node nod){
+                        node = nod;
+                }
+
+                float getNode(void){
+                        return node;
+                }
+
                 /*Valder operator=(Valder b){
                     //add dep
                 }*/
@@ -63,7 +83,9 @@ class Valder {
                     vd.AddDer(b,1);
                     vd.AddDer(*this,1);
                     vd.setName("deleteNameField");
+                    cout<<"+"<<endl;
                     return vd;
+
                }
                //subtraction
                Valder operator-(Valder b){
@@ -82,6 +104,9 @@ class Valder {
                     vd.AddDer(b,this->val);
                     vd.AddDer(*this,b.getVal());
                     vd.setName("deleteNameField");
+                    Node *n =  new Node;
+                    //????????????????????
+                    cout<<"*"<<endl;
                     return vd;
                }
                 //division
@@ -99,6 +124,7 @@ class Valder {
                 std::vector<tuple<Valder,float>> ders;
                 list<Valder> deps;//overrite = to add dependency to list, this will help to construct graph
                 string name;
+                Node node;
                 float val;
 
 };
@@ -127,7 +153,8 @@ Valder sin(Valder var) {
     v.setName("sinResult");
     v.setVal(var.getVal());
     v.AddDer(var,cos(var.getVal()));
-    cout << "Sin result added" << endl;
+    cout<<"sin"<<endl;
+
     return v;
 }
 
@@ -198,24 +225,20 @@ Valder Z(Valder var){
 
 
 int main() {
-
+    cout<<asin(1)<<endl;
     /// just try some stuff
     Valder a;
     Valder b;
     Valder result;
     a.setName("a");
     b.setName("b");
-    a.setVal(2.7);
-    a.AddDer(b,3);
-    b.setVal(2);
-    cout<<"a: "<<endl;
-    a.DisplayDerValues();
-    result.setVal(23);
-    result =a;
-    a=log(result)/b;
-    cout<<"a again: "<<a.getVal()<<endl;
-    a.DisplayDerValues();
+    a.setVal(1.5708);
+    b.setVal(16);
+    Valder res;
+    res=(b+sin(b)+sin(a)*b)+b;
 
+    res.DisplayDerValues();
+    cout<<res.getVal()<<endl;
     return 0;
 }
 
