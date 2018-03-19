@@ -4,241 +4,141 @@
 #include <list>
 #include <tuple>
 #include <math.h>
+#include "node.h"
+
 //http://www.cplusplus.com/reference/tuple/tuple/
-//implemented only operations between valders. TODO expand for valder, float operations -> tum floatlari valdere cast edeceksek gerek de yok mu acaba???
-// TODO add graph field to valder ? -> keys of AddDer graph yerine gecer mi??? niye lazim ki graph:D
+//implemented only operations between Nodes. TODO expand for Node, float operations -> tum floatlari Nodee cast edeceksek gerek de yok mu acaba???
+// TODO add graph field to Node ? -> keys of AddDer graph yerine gecer mi??? niye lazim ki graph:D
 //TODO remove name field?
-//TODO implement = overloading to pass by reference and to assign floats to valders at initialization.
+//TODO implement = overloading to pass by reference and to assign floats to Nodes at initialization.
 using namespace std;
 
-enum Operation { Sin,Cos,Sum,Div,Mult,Sub,Acos,Asin,Atan};
-/*Days day = Saturday;
-if(day == Saturday){
-    std::cout<<"Ok its Saturday";
-}*/
-struct Node
-{
-    Operation o;
-    Valder v1;
-    Valder v2=NULL;
-}Node;
 
-class Valder {
-
-        public:
-                Valder()
-                {}
-                ~Valder()
-                {}
-                std::vector<tuple<Valder,float>> GetCopyOfVector()
-                {
-                        return ders;
-                }
-                void AddDer(Valder derOf,float der)
-                {
-                tuple<Valder,float> tpl_der (derOf,der);
-                    ders.push_back(tpl_der);
-                }
-                void DisplayDerValues()
-                {
-                    cout<<"displaying ders:"<<endl;
-                        for( unsigned int i = 0; i < ders.size(); i++ )
-                        {
-                            cout<<"derivative to "<<std::get<0>(ders[i]).getName()<< " is: " << std::get<1>(ders[i]) << endl;
-                        }
-                        cout << endl;
-                }
-
-                void setName(string s){
-                        name = s;
-                }
-
-                string getName(void){
-                        return name;
-                }
-
-                void setVal(float v){
-                        val = v;
-                }
-
-                float getVal(void){
-                        return val;
-                }
-
-                void setNode(Node nod){
-                        node = nod;
-                }
-
-                float getNode(void){
-                        return node;
-                }
-
-                /*Valder operator=(Valder b){
-                    //add dep
-                }*/
-                // Overload + operator to add two Valder objects.
-                Valder operator+(Valder b) {
-                    Valder vd;
-                    vd.setVal(this->val + b.getVal());
-                    vd.AddDer(b,1);
-                    vd.AddDer(*this,1);
-                    vd.setName("deleteNameField");
-                    cout<<"+"<<endl;
-                    return vd;
-
-               }
-               //subtraction
-               Valder operator-(Valder b){
-                    Valder vd;
-                    vd.setVal(this->val-b.getVal());
-                    vd.AddDer(b,-1);
-                    vd.AddDer(*this,1);
-                    vd.setName("subtractionresult");
-                    return vd;
-                }
-
-               // Overload * operator to multiply two Valder objects.
-                Valder operator*(Valder b) {
-                    Valder vd;
-                    vd.setVal(this->val * b.getVal());
-                    vd.AddDer(b,this->val);
-                    vd.AddDer(*this,b.getVal());
-                    vd.setName("deleteNameField");
-                    Node *n =  new Node;
-                    //????????????????????
-                    cout<<"*"<<endl;
-                    return vd;
-               }
-                //division
-                Valder operator/(Valder b){
-                    Valder v;
-                    v.setVal(this->val / b.getVal());
-                    v.AddDer(b,(-this->val)/b.getVal()*b.getVal());
-                    v.AddDer(*this,1/b.getVal());
-                    v.setName("div result");
-                    return v;
-                }
-
-        private:
-            //we should really revise the structure.
-                std::vector<tuple<Valder,float>> ders;
-                list<Valder> deps;//overrite = to add dependency to list, this will help to construct graph
-                string name;
-                Node node;
-                float val;
-
-};
-
-Valder pow(Valder var,Valder p){
-    Valder v;
-    v.setName("powresult");
-    v.setVal(pow(var.getVal(),p.getVal()));
-    v.AddDer(var,p.getVal()*(pow(var.getVal(),p.getVal()-1)));
-    v.AddDer(p,pow(var.getVal(),p.getVal())*log(var.getVal()));
+Node& pow(const Node& var,Node p){
+    Node *newVar = (Node*)&var;
+    Node *newP = &p;
+    tuple<Node*,Node*> parents (newVar, newP);
+    Node* v = new Node(Operation::pow, &parents);
+    // Node *newV = &v;
+    Node::nodes.push_back(&v);
     return v;
 }
 
-Valder sqrt(Valder var){
-    Valder v;
-    v.setName("sqrtresult");
-    v.setVal(sqrt(var.getVal()));
-    v.AddDer(var,1/(2*sqrt(var.getVal())));
-    return v;
+Node& sqrt(const Node& var){
+    Node *newVar = (Node*)&var;
+    Node *newP = NULL;
+    tuple<Node*,Node*> parents (newVar, newP);
+    Node* v = new Node(Operation::sqrt, &parents);
+    Node *newV = &v;
+    Node::nodes.push_back(newV);
+    return *(Node::nodes.back());
 }
 
 
 
-Valder sin(Valder var) {
-    Valder v;
-    v.setName("sinResult");
-    v.setVal(var.getVal());
-    v.AddDer(var,cos(var.getVal()));
+Node& sin(const Node& var) {
+    Node *newVar = (Node*)&var;
+    Node *newP = NULL;
+    tuple<Node*,Node*> parents (newVar, newP);
+    Node* v = new Node(Operation::sin, &parents);
+    Node::nodes.push_back(v);
     cout<<"sin"<<endl;
-
-    return v;
+    // Node *newnode = new Node()
+    return *(Node::nodes.back());
 }
 
-Valder cos(Valder var) {
-    Valder v;
-    v.setName("cosResult");
-    v.setVal(var.getVal());
-    v.AddDer(var,(-1)*sin(var.getVal()));
+Node& cos(const Node& var) {
+    Node *newVar = (Node*)&var;
+    Node *newP = NULL;
+    tuple<Node*,Node*> parents (newVar, newP);
+    Node* v = new Node(Operation::cos, &parents);
     cout << "Cos result added" << endl;
-    return v;
+    Node *newV = &v;
+    Node::nodes.push_back(newV);
+    return *(Node::nodes.back());
 }
 
-Valder tan(Valder var){
-    Valder v;
-    v.setName("tanresult");
-    v.setVal(tan(var.getVal()));
-    v.AddDer(var,1/(pow(cos(var.getVal()),2)));
-    return v;
+Node& tan(const Node& var){
+    Node *newVar = (Node*)&var;
+    Node *newP = NULL;
+    tuple<Node*,Node*> parents (newVar, newP);
+    Node* v = new Node(Operation::tan, &parents);
+    Node *newV = &v;
+    Node::nodes.push_back(newV);
+    return *(Node::nodes.back());
 }
 
-Valder asin(Valder var){
-    Valder v;
-    v.setName("asinresult");
-    v.setVal(asin(var.getVal()));
-    v.AddDer(var,1/sqrt(1-pow(var.getVal(),2)));
-    return v;
+Node& asin(const Node& var){
+    Node *newVar = (Node*)&var;
+    Node *newP = NULL;
+    tuple<Node*,Node*> parents (newVar, newP);
+    Node* v = new Node(Operation::asin, &parents);
+    Node *newV = &v;
+    Node::nodes.push_back(newV);
+    return *(Node::nodes.back());
 }
-Valder acos(Valder var){
-    Valder v;
-    v.setName("acosresult");
-    v.setVal(acos(var.getVal()));
-    v.AddDer(var,(-1)/sqrt(1-pow(var.getVal(),2)));
-    return v;
-}
-
-Valder atan(Valder var){
-    Valder v;
-    v.setName("atanresult");
-    v.setVal(atan(var.getVal()));
-    v.AddDer(var,1/pow(var.getVal(),2)+1);
-    return v;
+Node& acos(const Node& var){
+    Node *newVar = (Node*)&var;
+    Node *newP = NULL;
+    tuple<Node*,Node*> parents (newVar, newP);
+    Node* v = new Node(Operation::acos, &parents);
+    Node *newV = &v;
+    Node::nodes.push_back(newV);
+    return *(Node::nodes.back());
 }
 
-Valder exp(Valder var){
-    Valder v;
-    v.setName("expresult");
-    v.setVal(exp(var.getVal()));
-    v.AddDer(var,exp(var.getVal()));
+Node& atan(const Node& var){
+    Node *newVar = (Node*)&var;
+    Node *newP = NULL;
+    tuple<Node*,Node*> parents (newVar, newP);
+    Node* v = new Node(Operation::atan, &parents);
+    Node *newV = &v;
+    Node::nodes.push_back(newV);
+    return *(Node::nodes.back());
 }
 
-Valder log(Valder var){
-    Valder v;
-    v.setName("logresult");
-    v.setVal(log(var.getVal()));
-    v.AddDer(var,1/var.getVal());
-    return v;
+Node& exp(const Node& var){
+    Node *newVar = (Node*)&var;
+    Node *newP = NULL;
+    tuple<Node*,Node*> parents (newVar, newP);
+    Node* v = new Node(Operation::exp, &parents);
+    Node *newV = &v;
+    Node::nodes.push_back(newV);
+    return *(Node::nodes.back());
 }
 
-/*//template
-
-Valder Z(Valder var){
-    Valder v;
-    v.setName("Zresult");
-    v.setVal(Z(var.getVal()));
-    v.AddDer(var,ZZZZ);
-    return v;
-}*/
+Node& log(const Node& var){
+    Node *newVar = (Node*)&var;
+    Node *newP = NULL;
+    tuple<Node*,Node*> parents (newVar, newP);
+    Node* v = new Node(Operation::log, &parents);
+    Node *newV = &v;
+    Node::nodes.push_back(newV);
+    return *(Node::nodes.back());
+}
 
 
 int main() {
     cout<<asin(1)<<endl;
     /// just try some stuff
-    Valder a;
-    Valder b;
-    Valder result;
+    Node a;
+    Node b;
+    // Node result;
     a.setName("a");
     b.setName("b");
     a.setVal(1.5708);
     b.setVal(16);
-    Valder res;
-    res=(b+sin(b)+sin(a)*b)+b;
-
+    Node res;
+    cout<<&a<<endl;
+    cout<<&b<<endl;
+    res=(b+sin(b))*a;
     res.DisplayDerValues();
     cout<<res.getVal()<<endl;
+    
+    for (vector<Node*>::iterator i = res.nodes.begin(); i != res.nodes.end(); ++i){
+        Node* a = *i;
+        cout << a->toString() << endl;
+    } 
     return 0;
 }
 
