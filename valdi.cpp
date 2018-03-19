@@ -14,14 +14,13 @@
 using namespace std;
 
 
-Node& pow(const Node& var,Node p){
+Node& pow(const Node& var,const Node&  p){
     Node *newVar = (Node*)&var;
-    Node *newP = &p;
+    Node *newP = (Node*)&p;
     tuple<Node*,Node*> parents (newVar, newP);
     Node* v = new Node(Operation::pow, &parents);
-    // Node *newV = &v;
-    Node::nodes.push_back(&v);
-    return v;
+    Node::nodes.push_back(v);
+    return *(Node::nodes.back());
 }
 
 Node& sqrt(const Node& var){
@@ -29,8 +28,7 @@ Node& sqrt(const Node& var){
     Node *newP = NULL;
     tuple<Node*,Node*> parents (newVar, newP);
     Node* v = new Node(Operation::sqrt, &parents);
-    Node *newV = &v;
-    Node::nodes.push_back(newV);
+    Node::nodes.push_back(v);
     return *(Node::nodes.back());
 }
 
@@ -53,8 +51,7 @@ Node& cos(const Node& var) {
     tuple<Node*,Node*> parents (newVar, newP);
     Node* v = new Node(Operation::cos, &parents);
     cout << "Cos result added" << endl;
-    Node *newV = &v;
-    Node::nodes.push_back(newV);
+    Node::nodes.push_back(v);
     return *(Node::nodes.back());
 }
 
@@ -63,8 +60,7 @@ Node& tan(const Node& var){
     Node *newP = NULL;
     tuple<Node*,Node*> parents (newVar, newP);
     Node* v = new Node(Operation::tan, &parents);
-    Node *newV = &v;
-    Node::nodes.push_back(newV);
+    Node::nodes.push_back(v);
     return *(Node::nodes.back());
 }
 
@@ -73,8 +69,7 @@ Node& asin(const Node& var){
     Node *newP = NULL;
     tuple<Node*,Node*> parents (newVar, newP);
     Node* v = new Node(Operation::asin, &parents);
-    Node *newV = &v;
-    Node::nodes.push_back(newV);
+    Node::nodes.push_back(v);
     return *(Node::nodes.back());
 }
 Node& acos(const Node& var){
@@ -82,8 +77,7 @@ Node& acos(const Node& var){
     Node *newP = NULL;
     tuple<Node*,Node*> parents (newVar, newP);
     Node* v = new Node(Operation::acos, &parents);
-    Node *newV = &v;
-    Node::nodes.push_back(newV);
+    Node::nodes.push_back(v);
     return *(Node::nodes.back());
 }
 
@@ -92,8 +86,7 @@ Node& atan(const Node& var){
     Node *newP = NULL;
     tuple<Node*,Node*> parents (newVar, newP);
     Node* v = new Node(Operation::atan, &parents);
-    Node *newV = &v;
-    Node::nodes.push_back(newV);
+    Node::nodes.push_back(v);
     return *(Node::nodes.back());
 }
 
@@ -102,8 +95,7 @@ Node& exp(const Node& var){
     Node *newP = NULL;
     tuple<Node*,Node*> parents (newVar, newP);
     Node* v = new Node(Operation::exp, &parents);
-    Node *newV = &v;
-    Node::nodes.push_back(newV);
+    Node::nodes.push_back(v);
     return *(Node::nodes.back());
 }
 
@@ -112,8 +104,7 @@ Node& log(const Node& var){
     Node *newP = NULL;
     tuple<Node*,Node*> parents (newVar, newP);
     Node* v = new Node(Operation::log, &parents);
-    Node *newV = &v;
-    Node::nodes.push_back(newV);
+    Node::nodes.push_back(v);
     return *(Node::nodes.back());
 }
 

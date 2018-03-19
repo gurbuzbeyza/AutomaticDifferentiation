@@ -74,8 +74,7 @@ Node& Node::operator-(const Node& b){
     Node *newB = (Node*)&b;
     tuple<Node*,Node*> parents (this, newB);
     Node* v = new Node(Operation::sub, &parents);
-    Node *newV = &v;
-    nodes.push_back(newV);
+    nodes.push_back(v);
     return *(nodes.back());
 }
 
@@ -93,8 +92,7 @@ Node& Node::operator/(const Node& b){
     Node *newB = (Node*)&b;
     tuple<Node*,Node*> parents (this, newB);
     Node* v = new Node(Operation::div, &parents);
-    Node *newV = &v;
-    nodes.push_back(newV);
+    nodes.push_back(v);
     return *(nodes.back());
 }
 
