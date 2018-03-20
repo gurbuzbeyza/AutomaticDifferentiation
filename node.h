@@ -7,6 +7,7 @@
 #include <list>
 #include <tuple>
 #include <math.h>
+#include <map>
 #include "operation.h"
 
 
@@ -16,20 +17,20 @@ using namespace std;
 class Node {
 
     //we should really revise the structure.
-    vector<tuple<Node,float>> ders;
-    list<Node> deps;//overrite = to add dependency to list, this will help to construct graph
+    vector<tuple<Node*,float>> derivatives;
     string name;
-    // Node node;
     float val;
     Operation operation;
     tuple<Node*,Node*> parents;
+    void findVals(Node* a, map<Node*, int>& nodeVals);
+    vector<tuple<Node*,float>> findDers(Node* a, map<Node*, int>& nodeVals);
 public:
     static vector<Node*> nodes;
     Node(Operation operation=Operation::noop, tuple<Node*,Node*>* parents=new tuple<Node*,Node*>);
     ~Node();
-    vector<tuple<Node,float>> GetCopyOfVector();
-    void AddDer(Node derOf,float der);
-    void DisplayDerValues();
+    // vector<tuple<Node,float>> GetCopyOfVector();
+    void AddDer(Node* derOf,float der);
+    // void DisplayDerValues();
     void setName(string s);
     string getName(void);
     void setVal(float v);
@@ -42,6 +43,9 @@ public:
     Node& operator-(const Node& b);
     Node& operator*(const Node& b);
     Node& operator/(const Node& b);
+    bool operator==(const Node& b);
+    Node* getNode();
+    float findDiff(map<Node*, int>& nodeVals, Node* n);
     string toString();
 
 };
