@@ -109,7 +109,7 @@ int main() {
     Node res;
     cout<<&a<<endl;
     cout<<&b<<endl;
-    res=(a+sin(b));
+    res=a;
     map<Node*, int> nodeVals;
     nodeVals[&a] = 3;
     nodeVals[&b] = 5;

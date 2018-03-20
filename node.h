@@ -9,6 +9,7 @@
 #include <math.h>
 #include <map>
 #include "operation.h"
+#include <cstring>
 
 
 using namespace std;
