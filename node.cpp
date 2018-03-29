@@ -7,7 +7,7 @@ Node::Node(Operation operation, tuple<Node*,Node*>* parents){
     this->parents = *parents;
     Node* n = this->getNode();
     if(NULL==n) {
-        this->nodes.push_back(this); 
+        this->nodes.push_back(this);
     }
 }
 
@@ -21,15 +21,6 @@ void Node::AddDer(Node* derOf,float der){
     tuple<Node*,float> tpl_der (derOf,der);
     derivatives.push_back(tpl_der);
 }
-
-// void Node::DisplayDerValues(){
-//     cout<<"displaying ders:"<<endl;
-//         for( unsigned int i = 0; i < ders.size(); i++ )
-//         {
-//             cout<<"derivative to "<<get<0>(ders[i]).getName()<< " is: " << get<1>(ders[i]) << endl;
-//         }
-//         cout << endl;
-// }
 
 void Node::setName(string s){
         name = s;
@@ -361,10 +352,10 @@ double* Node::findDiff(map<Node*, int>& nodeVals){
 }
 
 string Node::toString(){
-    cout<<this<<" ";
+    //cout<<this<<" ";
     
-    cout<<get<0>(parents)<<" ";
-    cout<<get<1>(parents)<<" ";
+    //cout<<get<0>(parents)<<" ";
+    //cout<<get<1>(parents)<<" ";
 
     return to_string(static_cast<underlying_type<Operation>::type>(this->operation));
 }
