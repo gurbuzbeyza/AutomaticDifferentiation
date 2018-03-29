@@ -101,26 +101,24 @@ int main() {
     Node a;
     Node b;
     cout<<get<1>(a.getParents())<<endl;
-    // Node result;
-    a.setName("a");
-    b.setName("b");
-    a.setVal(1.5708);
-    b.setVal(16);
     Node res;
-    cout<<&a<<endl;
-    cout<<&b<<endl;
-    res=(a+sin(b));
+    // cout<<&b<<endl;
+    res=(a*b)+b;
     map<Node*, int> nodeVals;
     nodeVals[&a] = 3;
     nodeVals[&b] = 5;
-    cout<<res.findDiff(nodeVals, &a)<<endl;
+    double* fs = res.findDiff(nodeVals);
+    for (int i = 0; i < 2; ++i)
+    {
+        cout<<fs[i]<<endl;
+    }
     // res.DisplayDerValues();
-    cout<<res.getVal()<<endl;
+    // cout<<res.getVal()<<endl;
     
-    for (vector<Node*>::iterator i = res.nodes.begin(); i != res.nodes.end(); ++i){
-        Node* a = *i;
-        cout << a->toString() << endl;
-    } 
+    // for (vector<Node*>::iterator i = res.nodes.begin(); i != res.nodes.end(); ++i){
+    //     Node* a = *i;
+    //     cout << a->toString() << endl;
+    // } 
     return 0;
 }
 

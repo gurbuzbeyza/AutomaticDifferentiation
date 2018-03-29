@@ -9,6 +9,7 @@
 #include <math.h>
 #include <map>
 #include "operation.h"
+#include "solve.hpp"
 
 
 using namespace std;
@@ -23,7 +24,8 @@ class Node {
     Operation operation;
     tuple<Node*,Node*> parents;
     void findVals(Node* a, map<Node*, int>& nodeVals);
-    vector<tuple<Node*,float>> findDers(Node* a, map<Node*, int>& nodeVals);
+    vector<tuple<Node*,float>> findDers(Node* a);
+    // float solveLinEq(float& Jacobian[lenNodes][lenNodes], Node& n);
 public:
     static vector<Node*> nodes;
     Node(Operation operation=Operation::noop, tuple<Node*,Node*>* parents=new tuple<Node*,Node*>);
@@ -43,9 +45,10 @@ public:
     Node& operator-(const Node& b);
     Node& operator*(const Node& b);
     Node& operator/(const Node& b);
+    Node& operator=(const Node& b);
     bool operator==(const Node& b);
     Node* getNode();
-    float findDiff(map<Node*, int>& nodeVals, Node* n);
+    double* findDiff(map<Node*, int>& nodeVals);
     string toString();
 
 };

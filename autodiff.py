@@ -267,7 +267,7 @@ def solve_lin_eq():
 	y = np.zeros(valderslen)
 
 	y[valderslen - 1] = -1
-
+	print(jacobian)
 	x = np.linalg.solve(jacobian, y)
 
 	return x
