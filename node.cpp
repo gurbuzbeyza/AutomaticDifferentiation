@@ -1,5 +1,5 @@
 #include "node.h"
-
+#include <cstring>
 vector<Node*> Node::nodes;
 
 Node::Node(Operation operation, tuple<Node*,Node*>* parents){
@@ -34,6 +34,14 @@ void Node::setVal(float v){
         val = v;
 }
 
+bool Node::isScalar(void){
+        return is_scalar;
+}
+
+void Node::setScalar(bool b){
+        is_scalar = b;
+}
+
 float Node::getVal(void){
         return val;
 }
@@ -62,12 +70,55 @@ Node& Node::operator+(const Node& b) {
     return *v->getNode();
 
 }
+
+Node& Node::operator+(int b) {
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)b);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (this, bs);
+    Node* v = new Node(Operation::add,&parents);
+    return *v ->getNode();
+
+}
+Node& Node::operator+(float b) {
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)b);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (this, bs);
+    Node* v = new Node(Operation::add,&parents);
+    return *v ->getNode();
+
+}
+
 //subtraction
 Node& Node::operator-(const Node& b){
     Node *newB = (Node*)&b;
     tuple<Node*,Node*> parents (this, newB);
     Node* v = new Node(Operation::sub, &parents);
     return *v->getNode();
+}
+Node& Node::operator-(int b) {
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)b);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (this, bs);
+    Node* v = new Node(Operation::sub,&parents);
+    return *v ->getNode();
+
+}
+
+Node& Node::operator-(float b) {
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)b);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (this, bs);
+    Node* v = new Node(Operation::sub,&parents);
+    return *v ->getNode();
+
 }
 
 // Overload * operator to multiply two Node objects.
@@ -77,12 +128,52 @@ Node& Node::operator*(const Node& b) {
     Node* v = new Node(Operation::mult, &parents);
     return *v->getNode();
 }
+Node& Node::operator*(int b) {
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)b);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (this, bs);
+    Node* v = new Node(Operation::mult,&parents);
+    return *v ->getNode();
+
+}
+
+Node& Node::operator*(float b) {
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)b);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (this, bs);
+    Node* v = new Node(Operation::mult,&parents);
+    return *v ->getNode();
+
+}
 //division
 Node& Node::operator/(const Node& b){
     Node *newB = (Node*)&b;
     tuple<Node*,Node*> parents (this, newB);
-    Node* v = new Node(Operation::div, &parents);
+    Node* v = new Node(Operation::divd, &parents);
     return *v->getNode();
+}
+Node& Node::operator/(int b) {
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)b);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (this, bs);
+    Node* v = new Node(Operation::divd,&parents);
+    return *v ->getNode();
+}
+
+Node& Node::operator/(float b) {
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)b);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (this, bs);
+    Node* v = new Node(Operation::divd,&parents);
+    return *v ->getNode();
 }
 
 Node& Node::operator=(const Node& b){
@@ -90,6 +181,16 @@ Node& Node::operator=(const Node& b){
     this->setVal(newB->getVal());
     tuple<Node*,Node*> parents (newB, NULL);
     this->setParents(parents);
+    return *this;
+}
+
+Node& Node::operator=(float b){
+    this->setVal(b);
+    return *this;
+}
+
+Node& Node::operator=(int b){
+    this->setVal(b);
     return *this;
 }
 
@@ -121,14 +222,11 @@ Node* Node::getNode(){
     return NULL;
 }
 
-void Node::findVals(Node* a, map<Node*, int>& nodeVals){
+void Node::findVals(Node* a){
     switch(a->getOperation()) {
         case Operation::noop :
             if (NULL != get<0>(a->getParents())) {
                 a->setVal(get<0>(a->getParents())->getVal());
-            }
-            else {
-                a->setVal(nodeVals[a]);
             }
             break;
         case Operation::add :
@@ -140,7 +238,7 @@ void Node::findVals(Node* a, map<Node*, int>& nodeVals){
         case Operation::mult :
             a->setVal(get<0>(a->getParents())->getVal() * get<1>(a->getParents())->getVal());
             break;
-        case Operation::div :
+        case Operation::divd :
             a->setVal(get<0>(a->getParents())->getVal() / get<1>(a->getParents())->getVal());
             break;
         case Operation::sin :
@@ -212,7 +310,7 @@ vector<tuple<Node*,float>> Node::findDers(Node* a){
                 a->AddDer(get<1>(a->getParents()), get<0>(a->getParents())->getVal());
             }
             break;
-        case Operation::div :
+        case Operation::divd :
             if (get<0>(a->getParents())==get<1>(a->getParents())){
                 a->AddDer(get<0>(a->getParents()), 0);
             }else{
@@ -289,13 +387,16 @@ vector<tuple<Node*,float>> Node::findDers(Node* a){
 //     }
 // }
 
-double* Node::findDiff(map<Node*, int>& nodeVals){
+double* Node::findDiff(){
+    int lenInputs = 0;
     for (vector<Node*>::iterator i = this->nodes.begin(); i != this->nodes.end(); ++i){
         Node* a = *i;
-        findVals(a, nodeVals);
+        findVals(a);
+        if (NULL == get<0>(a->getParents())&& NULL == get<1>(a->getParents())&& !(a->isScalar())){
+            lenInputs++;
+        }
     }
     int lenNodes = nodes.size();
-    int lenInputs = nodeVals.size();
     double** Jacobian = new double*[lenNodes];
     for (int i = 0; i < lenNodes; ++i){
         Jacobian[i] = new double[lenNodes];
@@ -324,24 +425,25 @@ double* Node::findDiff(map<Node*, int>& nodeVals){
     for (int i = 0; i < lenNodes; ++i){
         Jacobian[i][i] = -1;
     }
-    cout<<"------"<<endl;
+    /*cout<<"------"<<endl;
     for (int i = 0; i < lenNodes; ++i){
         for (int j = 0; j < lenNodes; ++j)
         {
             cout<<Jacobian[i][j]<<" ";
         }
         cout<<endl;
-    }
+    }*/
     double* y = new double[lenNodes];
     memset(y, 0, lenNodes*sizeof(double));
     y[lenNodes-1] = -1;
-    cout<<"------"<<endl;
+    //cout<<"------"<<endl;
     double* x = r8rmat_fs_new (lenNodes, Jacobian, y);
-    for (int i = 0; i < lenNodes; ++i)
+    /*for (int i = 0; i < lenNodes; ++i)
     {
         cout<<x[i]<<" ";
     }
     cout<<endl;
+    */
     double* out = new double[lenInputs];
     for (int i = 0; i < lenInputs; ++i)
     {

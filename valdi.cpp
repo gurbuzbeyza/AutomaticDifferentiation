@@ -6,11 +6,6 @@
 #include <math.h>
 #include "node.h"
 
-//http://www.cplusplus.com/reference/tuple/tuple/
-//implemented only operations between Nodes. TODO expand for Node, float operations -> tum floatlari Nodee cast edeceksek gerek de yok mu acaba???
-// TODO add graph field to Node ? -> keys of AddDer graph yerine gecer mi??? niye lazim ki graph:D
-//TODO remove name field?
-//TODO implement = overloading to pass by reference and to assign floats to Nodes at initialization.
 using namespace std;
 
 
@@ -95,35 +90,156 @@ Node& log(const Node& var){
     return *v->getNode();
 }
 
+Node sigmoid(Node x){
+    return exp(x);
+}
+
+Node& operator+(int i, const Node& n)
+{
+    Node *newVar = (Node*)&n;
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)i);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (bs, newVar);
+    Node* v = new Node(Operation::add,&parents);
+    return *v ->getNode();
+}
+
+Node& operator+(float i, const Node& n)
+{
+    Node *newVar = (Node*)&n;
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)i);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (bs, newVar);
+    Node* v = new Node(Operation::add,&parents);
+    return *v ->getNode();
+}
+
+Node& operator-(int i, const Node& n)
+{
+    Node *newVar = (Node*)&n;
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)i);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (bs, newVar);
+    Node* v = new Node(Operation::sub,&parents);
+    return *v ->getNode();
+}
+
+Node& operator-(float i, const Node& n)
+{
+    Node *newVar = (Node*)&n;
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)i);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (bs, newVar);
+    Node* v = new Node(Operation::sub,&parents);
+    return *v ->getNode();
+}
+
+Node& operator*(int i, const Node& n)
+{
+    Node *newVar = (Node*)&n;
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)i);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (bs, newVar);
+    Node* v = new Node(Operation::mult,&parents);
+    return *v ->getNode();
+}
+
+Node& operator*(float i, const Node& n)
+{
+    Node *newVar = (Node*)&n;
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)i);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (bs, newVar);
+    Node* v = new Node(Operation::mult,&parents);
+    return *v ->getNode();
+}
+
+Node& operator/(int i, const Node& n)
+{
+    Node *newVar = (Node*)&n;
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)i);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (bs, newVar);
+    Node* v = new Node(Operation::divd,&parents);
+    return *v ->getNode();
+}
+
+Node& operator/(float i, const Node& n)
+{
+    Node *newVar = (Node*)&n;
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal((float)i);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (bs, newVar);
+    Node* v = new Node(Operation::divd,&parents);
+    return *v ->getNode();
+}
+
+Node& operator-(const Node& n)
+{
+    Node *newVar = (Node*)&n;
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal(-1);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (bs, newVar);
+    Node* v = new Node(Operation::mult,&parents);
+    return *v ->getNode();
+}
+
+Node& operator+(const Node& n)
+{
+    Node *newVar = (Node*)&n;
+    tuple<Node*,Node*> noParents (NULL, NULL);
+    Node* bs = new Node(Operation::noop, &noParents);
+    bs-> setVal(1);
+    bs-> setScalar(true);
+    tuple<Node*,Node*> parents (bs, newVar);
+    Node* v = new Node(Operation::mult,&parents);
+    return *v ->getNode();
+}
+
+
 
 int main() {
     /// just try some stuff
     Node a;
     Node b;
-    cout<<get<1>(a.getParents())<<endl;
+    Node c;
     Node res;
-    // cout<<&b<<endl;
-    res=(a*b)+b;
-    map<Node*, int> nodeVals;
-    nodeVals[&a] = 3;
-    nodeVals[&b] = 5;
-    double* fs = res.findDiff(nodeVals);
-    for (int i = 0; i < 2; ++i)
+    res=((c)+c);
+    //map<Node*, int> nodeVals;
+    a = 4;
+    b = 25;
+    c = 2;
+    Node ar [3] = {a,b,c};
+    cout<<ar[0].getVal()<<endl;
+   // cout<<ar[0]<<endl;
+
+
+    //////////////// bu kismi nodeValsi universal tutup = overloadinge eklemeliyiz./////////////////
+    //nodeVals[&a] = a.getVal();
+    //nodeVals[&b] = b.getVal();
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    double* fs = res.findDiff();
+    for (int i = 0; i < 3; ++i)
     {
-        cout<<fs[i]<<endl;
+        cout<<"fsi: "<<fs[i]<<endl;
     }
-    // res.DisplayDerValues();
-    // cout<<res.getVal()<<endl;
-    
-    // for (vector<Node*>::iterator i = res.nodes.begin(); i != res.nodes.end(); ++i){
-    //     Node* a = *i;
-    //     cout << a->toString() << endl;
-    // } 
     return 0;
 }
-
-
-
-//https://www.tutorialspoint.com/cplusplus/cpp_overloading.htm -> add many on the list, like unary (-)
-
-//http://warp.povusers.org/FunctionParser/  -> warping in c++

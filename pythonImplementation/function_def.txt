@@ -1,0 +1,4 @@
+input x_1 x-2
+output f
+t_1 = mult x_1 x_2
+f   = t_1

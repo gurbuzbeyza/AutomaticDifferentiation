@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <list>
 #include <tuple>
 #include <math.h>
@@ -21,9 +22,10 @@ class Node {
     vector<tuple<Node*,float>> derivatives;
     string name;
     float val;
+    bool is_scalar=false;
     Operation operation;
     tuple<Node*,Node*> parents;
-    void findVals(Node* a, map<Node*, int>& nodeVals);
+    void findVals(Node* a);
     vector<tuple<Node*,float>> findDers(Node* a);
     // float solveLinEq(float& Jacobian[lenNodes][lenNodes], Node& n);
 public:
@@ -34,7 +36,10 @@ public:
     void AddDer(Node* derOf,float der);
     // void DisplayDerValues();
     void setName(string s);
+
     string getName(void);
+    bool isScalar(void);
+    void setScalar(bool b);
     void setVal(float v);
     float getVal(void);
     void setOperation(Operation operation);
@@ -42,13 +47,23 @@ public:
     void setParents(tuple<Node*,Node*> parents);
     tuple<Node*,Node*> getParents(void);
     Node& operator+(const Node& b);
+    Node& operator+(float b);
+    Node& operator+(int b);
     Node& operator-(const Node& b);
+    Node& operator-(float b);
+    Node& operator-(int b);
     Node& operator*(const Node& b);
+    Node& operator*(float b);
+    Node& operator*(int b);
     Node& operator/(const Node& b);
+    Node& operator/(float b);
+    Node& operator/(int b);
     Node& operator=(const Node& b);
+    Node& operator=(int b);
+    Node& operator=(float b);
     bool operator==(const Node& b);
     Node* getNode();
-    double* findDiff(map<Node*, int>& nodeVals);
+    double* findDiff();
     string toString();
 
 };
