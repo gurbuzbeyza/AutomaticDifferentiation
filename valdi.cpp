@@ -4,242 +4,115 @@
 #include <list>
 #include <tuple>
 #include <math.h>
-#include "node.h"
+#include "var.h"
 
 using namespace std;
 
-
-Node& pow(const Node& var,const Node&  p){
-    Node *newVar = (Node*)&var;
-    Node *newP = (Node*)&p;
-    tuple<Node*,Node*> parents (newVar, newP);
-    Node* v = new Node(Operation::pow, &parents);
-    return *v->getNode();
+Var& pow(const Var& var,const Var&  p){
+    Var *newVar = (Var*)&var;
+    Var *newP = (Var*)&p;
+    tuple<Var*,Var*> parents (newVar, newP);
+    Var* v = new Var(Operation::pow, &parents);
+    return *v->getVar();
 }
 
-Node& sqrt(const Node& var){
-    Node *newVar = (Node*)&var;
-    Node *newP = NULL;
-    tuple<Node*,Node*> parents (newVar, newP);
-    Node* v = new Node(Operation::sqrt, &parents);
-    return *v->getNode();
+Var&makeUnaryOperation(const Var& var, Operation op){
+    Var *newVar = (Var*)&var;
+    Var *newP = NULL;
+    tuple<Var*,Var*> parents (newVar, newP);
+    Var* v = new Var(op, &parents);
+    return *v->getVar();    
 }
 
-Node& sin(const Node& var) {
-    Node *newVar = (Node*)&var;
-    Node *newP = NULL;
-    tuple<Node*,Node*> parents (newVar, newP);
-    Node* v = new Node(Operation::sin, &parents);
-    // Node *newnode = new Node()
-    return *v->getNode();
-}
+Var& sqrt(const Var& var)
+{    return makeUnaryOperation(var,Operation::sqrt);    }
 
-Node& cos(const Node& var) {
-    Node *newVar = (Node*)&var;
-    Node *newP = NULL;
-    tuple<Node*,Node*> parents (newVar, newP);
-    Node* v = new Node(Operation::cos, &parents);
-    return *v->getNode();
-}
+Var& sin(const Var& var)
+{   return makeUnaryOperation(var,Operation::sin);  }
 
-Node& tan(const Node& var){
-    Node *newVar = (Node*)&var;
-    Node *newP = NULL;
-    tuple<Node*,Node*> parents (newVar, newP);
-    Node* v = new Node(Operation::tan, &parents);
-    return *v->getNode();
-}
+Var& cos(const Var& var)
+{   return makeUnaryOperation(var,Operation::cos);  }
 
-Node& asin(const Node& var){
-    Node *newVar = (Node*)&var;
-    Node *newP = NULL;
-    tuple<Node*,Node*> parents (newVar, newP);
-    Node* v = new Node(Operation::asin, &parents);
-    return *v->getNode();
-}
+Var& tan(const Var& var)
+{   return makeUnaryOperation(var,Operation::tan);  }
 
-Node& acos(const Node& var){
-    Node *newVar = (Node*)&var;
-    Node *newP = NULL;
-    tuple<Node*,Node*> parents (newVar, newP);
-    Node* v = new Node(Operation::acos, &parents);
-    return *v->getNode();
-}
+Var& asin(const Var& var)
+{   return makeUnaryOperation(var,Operation::asin);  }
 
-Node& atan(const Node& var){
-    Node *newVar = (Node*)&var;
-    Node *newP = NULL;
-    tuple<Node*,Node*> parents (newVar, newP);
-    Node* v = new Node(Operation::atan, &parents);
-    return *v->getNode();
-}
+Var& acos(const Var& var)
+{   return makeUnaryOperation(var,Operation::acos);  }
 
-Node& exp(const Node& var){
-    Node *newVar = (Node*)&var;
-    Node *newP = NULL;
-    tuple<Node*,Node*> parents (newVar, newP);
-    Node* v = new Node(Operation::exp, &parents);
-    return *v->getNode();
-}
+Var& atan(const Var& var)
+{   return makeUnaryOperation(var,Operation::atan);  }
 
-Node& log(const Node& var){
-    Node *newVar = (Node*)&var;
-    Node *newP = NULL;
-    tuple<Node*,Node*> parents (newVar, newP);
-    Node* v = new Node(Operation::log, &parents);
-    return *v->getNode();
-}
+Var& exp(const Var& var)
+{   return makeUnaryOperation(var,Operation::exp);  }
 
-Node sigmoid(Node x){
-    return exp(x);
-}
+Var& log(const Var& var)
+{   return makeUnaryOperation(var,Operation::log);  }
 
-Node& operator+(int i, const Node& n)
-{
-    Node *newVar = (Node*)&n;
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
-    bs-> setVal((float)i);
+
+Var& makeBinaryScalarOperator(float i, const Var& n, Operation op){
+    Var *newVar = (Var*)&n;
+    tuple<Var*,Var*> noParents (NULL, NULL);
+    Var* bs = new Var(Operation::noop, &noParents);
+    bs-> setVal(i);
     bs-> setScalar(true);
-    tuple<Node*,Node*> parents (bs, newVar);
-    Node* v = new Node(Operation::add,&parents);
-    return *v ->getNode();
+    tuple<Var*,Var*> parents (bs, newVar);
+    Var* v = new Var(op,&parents);
+    return *v ->getVar();
 }
 
-Node& operator+(float i, const Node& n)
-{
-    Node *newVar = (Node*)&n;
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
-    bs-> setVal((float)i);
-    bs-> setScalar(true);
-    tuple<Node*,Node*> parents (bs, newVar);
-    Node* v = new Node(Operation::add,&parents);
-    return *v ->getNode();
+Var& operator+(float i, const Var& n)
+{    return makeBinaryScalarOperator(i,n,Operation::add);    }
+
+Var& operator-(float i, const Var& n)
+{    return makeBinaryScalarOperator(i,n,Operation::sub);   }
+
+Var& operator*(float i, const Var& n)
+{    return makeBinaryScalarOperator(i,n,Operation::mult);  }
+
+Var& operator/(float i, const Var& n)
+{    return makeBinaryScalarOperator(i,n,Operation::divd);   }
+
+Var& operator-(const Var& n)
+{    return makeBinaryScalarOperator(-1.0,n,Operation::mult);   }
+
+Var& operator+(const Var& n)
+{    return makeBinaryScalarOperator(1.0,n,Operation::mult);    }
+
+
+void printDiffs(Var & n){
+
+    double* fs = n.findDiff();
+    cout<<"derivatives: "<<endl;
+    for (int i = 0; i < 2; ++i)
+    {
+            cout<<i<<": "<<fs[i]<<endl;
+    }
 }
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////MAIN////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
-Node& operator-(int i, const Node& n)
-{
-    Node *newVar = (Node*)&n;
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
-    bs-> setVal((float)i);
-    bs-> setScalar(true);
-    tuple<Node*,Node*> parents (bs, newVar);
-    Node* v = new Node(Operation::sub,&parents);
-    return *v ->getNode();
+Var& someCalculations(Var& a, Var& b){
+    return a*b;
 }
-
-Node& operator-(float i, const Node& n)
-{
-    Node *newVar = (Node*)&n;
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
-    bs-> setVal((float)i);
-    bs-> setScalar(true);
-    tuple<Node*,Node*> parents (bs, newVar);
-    Node* v = new Node(Operation::sub,&parents);
-    return *v ->getNode();
-}
-
-Node& operator*(int i, const Node& n)
-{
-    Node *newVar = (Node*)&n;
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
-    bs-> setVal((float)i);
-    bs-> setScalar(true);
-    tuple<Node*,Node*> parents (bs, newVar);
-    Node* v = new Node(Operation::mult,&parents);
-    return *v ->getNode();
-}
-
-Node& operator*(float i, const Node& n)
-{
-    Node *newVar = (Node*)&n;
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
-    bs-> setVal((float)i);
-    bs-> setScalar(true);
-    tuple<Node*,Node*> parents (bs, newVar);
-    Node* v = new Node(Operation::mult,&parents);
-    return *v ->getNode();
-}
-
-Node& operator/(int i, const Node& n)
-{
-    Node *newVar = (Node*)&n;
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
-    bs-> setVal((float)i);
-    bs-> setScalar(true);
-    tuple<Node*,Node*> parents (bs, newVar);
-    Node* v = new Node(Operation::divd,&parents);
-    return *v ->getNode();
-}
-
-Node& operator/(float i, const Node& n)
-{
-    Node *newVar = (Node*)&n;
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
-    bs-> setVal((float)i);
-    bs-> setScalar(true);
-    tuple<Node*,Node*> parents (bs, newVar);
-    Node* v = new Node(Operation::divd,&parents);
-    return *v ->getNode();
-}
-
-Node& operator-(const Node& n)
-{
-    Node *newVar = (Node*)&n;
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
-    bs-> setVal(-1);
-    bs-> setScalar(true);
-    tuple<Node*,Node*> parents (bs, newVar);
-    Node* v = new Node(Operation::mult,&parents);
-    return *v ->getNode();
-}
-
-Node& operator+(const Node& n)
-{
-    Node *newVar = (Node*)&n;
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
-    bs-> setVal(1);
-    bs-> setScalar(true);
-    tuple<Node*,Node*> parents (bs, newVar);
-    Node* v = new Node(Operation::mult,&parents);
-    return *v ->getNode();
-}
-
-
 
 int main() {
     /// just try some stuff
-    Node a;
-    Node b;
-    Node c;
-    Node res;
-    res=((c)+c);
-    //map<Node*, int> nodeVals;
-    a = 4;
-    b = 25;
-    c = 2;
-    Node ar [3] = {a,b,c};
-    cout<<ar[0].getVal()<<endl;
-   // cout<<ar[0]<<endl;
 
+    //define nodes
+    Var a;
+    Var b;
+    Var res;
+    //res = {1,2};
+    //
+    res = -a;
+    //res = someCalculations(a,b);
+    a = 5;
+    b = 7;
 
-    //////////////// bu kismi nodeValsi universal tutup = overloadinge eklemeliyiz./////////////////
-    //nodeVals[&a] = a.getVal();
-    //nodeVals[&b] = b.getVal();
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    double* fs = res.findDiff();
-    for (int i = 0; i < 3; ++i)
-    {
-        cout<<"fsi: "<<fs[i]<<endl;
-    }
+    printDiffs(res);
     return 0;
 }

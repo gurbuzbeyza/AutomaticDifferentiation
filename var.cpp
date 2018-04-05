@@ -1,202 +1,202 @@
-#include "node.h"
+#include "var.h"
 #include <cstring>
-vector<Node*> Node::nodes;
+vector<Var*> Var::nodes;
 
-Node::Node(Operation operation, tuple<Node*,Node*>* parents){
+Var::Var(Operation operation, tuple<Var*,Var*>* parents){
     this->operation = operation;
     this->parents = *parents;
-    Node* n = this->getNode();
+    Var* n = this->getVar();
     if(NULL==n) {
         this->nodes.push_back(this);
     }
 }
 
-Node::~Node(){}
+Var::~Var(){}
 
-// vector<tuple<Node,float>> Node::GetCopyOfVector(){
+// vector<tuple<Var,float>> Var::GetCopyOfVector(){
 //         return ders;
 // }
 
-void Node::AddDer(Node* derOf,float der){
-    tuple<Node*,float> tpl_der (derOf,der);
+void Var::AddDer(Var* derOf,float der){
+    tuple<Var*,float> tpl_der (derOf,der);
     derivatives.push_back(tpl_der);
 }
 
-void Node::setName(string s){
+void Var::setName(string s){
         name = s;
 }
 
-string Node::getName(void){
+string Var::getName(void){
         return name;
 }
 
-void Node::setVal(float v){
+void Var::setVal(float v){
         val = v;
 }
 
 
-bool Node::isScalar(void){
+bool Var::isScalar(void){
         return is_scalar;
 }
 
-void Node::setScalar(bool b){
+void Var::setScalar(bool b){
         is_scalar = b;
 }
 
-float Node::getVal(void){
+float Var::getVal(void){
         return val;
 }
 
-void Node::setOperation(Operation operation){
+void Var::setOperation(Operation operation){
     this->operation = operation;
 }
 
-Operation Node::getOperation(void){
+Operation Var::getOperation(void){
     return this->operation;
 }
 
-void Node::setParents(tuple<Node*,Node*> parents){
+void Var::setParents(tuple<Var*,Var*> parents){
     this->parents = parents;
 }
 
-tuple<Node*,Node*> Node::getParents(void){
+tuple<Var*,Var*> Var::getParents(void){
     return this->parents;
 }
 
-// Overload + operator to add two Node objects.
-Node& Node::operator+(const Node& b) {
-    Node *newB = (Node*)&b;
-    tuple<Node*,Node*> parents (this, newB);
-    Node* v = new Node(Operation::add, &parents);
-    return *v->getNode();
+// Overload + operator to add two Var objects.
+Var& Var::operator+(const Var& b) {
+    Var *newB = (Var*)&b;
+    tuple<Var*,Var*> parents (this, newB);
+    Var* v = new Var(Operation::add, &parents);
+    return *v->getVar();
 
 }
 
-Node& Node::operator+(int b) {
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
+Var& Var::operator+(int b) {
+    tuple<Var*,Var*> noParents (NULL, NULL);
+    Var* bs = new Var(Operation::noop, &noParents);
     bs-> setVal((float)b);
     bs-> setScalar(true);
-    tuple<Node*,Node*> parents (this, bs);
-    Node* v = new Node(Operation::add,&parents);
-    return *v ->getNode();
+    tuple<Var*,Var*> parents (this, bs);
+    Var* v = new Var(Operation::add,&parents);
+    return *v ->getVar();
 
 }
-Node& Node::operator+(float b) {
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
+Var& Var::operator+(float b) {
+    tuple<Var*,Var*> noParents (NULL, NULL);
+    Var* bs = new Var(Operation::noop, &noParents);
     bs-> setVal((float)b);
     bs-> setScalar(true);
-    tuple<Node*,Node*> parents (this, bs);
-    Node* v = new Node(Operation::add,&parents);
-    return *v ->getNode();
+    tuple<Var*,Var*> parents (this, bs);
+    Var* v = new Var(Operation::add,&parents);
+    return *v ->getVar();
 
 }
 
 //subtraction
-Node& Node::operator-(const Node& b){
-    Node *newB = (Node*)&b;
-    tuple<Node*,Node*> parents (this, newB);
-    Node* v = new Node(Operation::sub, &parents);
-    return *v->getNode();
+Var& Var::operator-(const Var& b){
+    Var *newB = (Var*)&b;
+    tuple<Var*,Var*> parents (this, newB);
+    Var* v = new Var(Operation::sub, &parents);
+    return *v->getVar();
 }
-Node& Node::operator-(int b) {
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
+Var& Var::operator-(int b) {
+    tuple<Var*,Var*> noParents (NULL, NULL);
+    Var* bs = new Var(Operation::noop, &noParents);
     bs-> setVal((float)b);
     bs-> setScalar(true);
-    tuple<Node*,Node*> parents (this, bs);
-    Node* v = new Node(Operation::sub,&parents);
-    return *v ->getNode();
+    tuple<Var*,Var*> parents (this, bs);
+    Var* v = new Var(Operation::sub,&parents);
+    return *v ->getVar();
 
 }
 
-Node& Node::operator-(float b) {
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
+Var& Var::operator-(float b) {
+    tuple<Var*,Var*> noParents (NULL, NULL);
+    Var* bs = new Var(Operation::noop, &noParents);
     bs-> setVal((float)b);
     bs-> setScalar(true);
-    tuple<Node*,Node*> parents (this, bs);
-    Node* v = new Node(Operation::sub,&parents);
-    return *v ->getNode();
+    tuple<Var*,Var*> parents (this, bs);
+    Var* v = new Var(Operation::sub,&parents);
+    return *v ->getVar();
 
 }
 
-// Overload * operator to multiply two Node objects.
-Node& Node::operator*(const Node& b) {
-    Node *newB = (Node*)&b;
-    tuple<Node*,Node*> parents (this, newB);
-    Node* v = new Node(Operation::mult, &parents);
-    return *v->getNode();
+// Overload * operator to multiply two Var objects.
+Var& Var::operator*(const Var& b) {
+    Var *newB = (Var*)&b;
+    tuple<Var*,Var*> parents (this, newB);
+    Var* v = new Var(Operation::mult, &parents);
+    return *v->getVar();
 }
-Node& Node::operator*(int b) {
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
+Var& Var::operator*(int b) {
+    tuple<Var*,Var*> noParents (NULL, NULL);
+    Var* bs = new Var(Operation::noop, &noParents);
     bs-> setVal((float)b);
     bs-> setScalar(true);
-    tuple<Node*,Node*> parents (this, bs);
-    Node* v = new Node(Operation::mult,&parents);
-    return *v ->getNode();
+    tuple<Var*,Var*> parents (this, bs);
+    Var* v = new Var(Operation::mult,&parents);
+    return *v ->getVar();
 
 }
 
-Node& Node::operator*(float b) {
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
+Var& Var::operator*(float b) {
+    tuple<Var*,Var*> noParents (NULL, NULL);
+    Var* bs = new Var(Operation::noop, &noParents);
     bs-> setVal((float)b);
     bs-> setScalar(true);
-    tuple<Node*,Node*> parents (this, bs);
-    Node* v = new Node(Operation::mult,&parents);
-    return *v ->getNode();
+    tuple<Var*,Var*> parents (this, bs);
+    Var* v = new Var(Operation::mult,&parents);
+    return *v ->getVar();
 
 }
 //division
-Node& Node::operator/(const Node& b){
-    Node *newB = (Node*)&b;
-    tuple<Node*,Node*> parents (this, newB);
-    Node* v = new Node(Operation::divd, &parents);
-    return *v->getNode();
+Var& Var::operator/(const Var& b){
+    Var *newB = (Var*)&b;
+    tuple<Var*,Var*> parents (this, newB);
+    Var* v = new Var(Operation::divd, &parents);
+    return *v->getVar();
 }
-Node& Node::operator/(int b) {
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
+Var& Var::operator/(int b) {
+    tuple<Var*,Var*> noParents (NULL, NULL);
+    Var* bs = new Var(Operation::noop, &noParents);
     bs-> setVal((float)b);
     bs-> setScalar(true);
-    tuple<Node*,Node*> parents (this, bs);
-    Node* v = new Node(Operation::divd,&parents);
-    return *v ->getNode();
+    tuple<Var*,Var*> parents (this, bs);
+    Var* v = new Var(Operation::divd,&parents);
+    return *v ->getVar();
 }
 
-Node& Node::operator/(float b) {
-    tuple<Node*,Node*> noParents (NULL, NULL);
-    Node* bs = new Node(Operation::noop, &noParents);
+Var& Var::operator/(float b) {
+    tuple<Var*,Var*> noParents (NULL, NULL);
+    Var* bs = new Var(Operation::noop, &noParents);
     bs-> setVal((float)b);
     bs-> setScalar(true);
-    tuple<Node*,Node*> parents (this, bs);
-    Node* v = new Node(Operation::divd,&parents);
-    return *v ->getNode();
+    tuple<Var*,Var*> parents (this, bs);
+    Var* v = new Var(Operation::divd,&parents);
+    return *v ->getVar();
 }
 
-Node& Node::operator=(const Node& b){
-    Node *newB = (Node*)&b;
+Var& Var::operator=(const Var& b){
+    Var *newB = (Var*)&b;
     this->setVal(newB->getVal());
-    tuple<Node*,Node*> parents (newB, NULL);
+    tuple<Var*,Var*> parents (newB, NULL);
     this->setParents(parents);
     return *this;
 }
 
-Node& Node::operator=(float b){
+Var& Var::operator=(float b){
     this->setVal(b);
     return *this;
 }
 
-Node& Node::operator=(int b){
+Var& Var::operator=(int b){
     this->setVal(b);
     return *this;
 }
 
-bool Node::operator==(const Node& b){
-    Node *newB = (Node*)&b;
+bool Var::operator==(const Var& b){
+    Var *newB = (Var*)&b;
     if (get<0>(this->parents) != get<0>(newB->parents)){
         return false;
     }
@@ -213,9 +213,9 @@ bool Node::operator==(const Node& b){
 }
 
 
-Node* Node::getNode(){
-    for (vector<Node*>::iterator i = this->nodes.begin(); i != this->nodes.end(); ++i){
-        Node* a = *i;
+Var* Var::getVar(){
+    for (vector<Var*>::iterator i = this->nodes.begin(); i != this->nodes.end(); ++i){
+        Var* a = *i;
         if (*a == *this){
             return a;
         }
@@ -223,7 +223,7 @@ Node* Node::getNode(){
     return NULL;
 }
 
-void Node::findVals(Node* a){
+void Var::findVals(Var* a){
     switch(a->getOperation()) {
         case Operation::noop :
             if (NULL != get<0>(a->getParents())) {
@@ -275,7 +275,7 @@ void Node::findVals(Node* a){
     }
 }
 
-vector<tuple<Node*,float>> Node::findDers(Node* a){
+vector<tuple<Var*,float>> Var::findDers(Var* a){
     //TODO scalar operations may be added later
     switch(a->getOperation()) {
         case Operation::noop :
@@ -355,35 +355,35 @@ vector<tuple<Node*,float>> Node::findDers(Node* a){
 }
 
 
-double* Node::findDiff(){
+double* Var::findDiff(){
     int lenInputs = 0;
-    for (vector<Node*>::iterator i = this->nodes.begin(); i != this->nodes.end(); ++i){
-        Node* a = *i;
+    for (vector<Var*>::iterator i = this->nodes.begin(); i != this->nodes.end(); ++i){
+        Var* a = *i;
         findVals(a);
         if (NULL == get<0>(a->getParents())&& NULL == get<1>(a->getParents())&& !(a->isScalar())){
             lenInputs++;
         }
     }
-    int lenNodes = nodes.size();
-    double** Jacobian = new double*[lenNodes];
-    for (int i = 0; i < lenNodes; ++i){
-        Jacobian[i] = new double[lenNodes];
-        for (int j = 0; j < lenNodes; ++j)
+    int lenVars = nodes.size();
+    double** Jacobian = new double*[lenVars];
+    for (int i = 0; i < lenVars; ++i){
+        Jacobian[i] = new double[lenVars];
+        for (int j = 0; j < lenVars; ++j)
         {
             Jacobian[i][j] = 0;
         }
     }
-    // memset(Jacobian, 0, lenNodes*lenNodes*sizeof(double));
-    for (int i = 0; i < lenNodes; ++i){
+    // memset(Jacobian, 0, lenVars*lenVars*sizeof(double));
+    for (int i = 0; i < lenVars; ++i){
         Jacobian[i][i] = -1;
     }
     int j = 0;
-    for (vector<Node*>::iterator i = this->nodes.begin(); i != this->nodes.end(); ++i){
-        Node* a = *i;
-        vector<tuple<Node*,float>> ders = findDers(a);
-        // ders.push_back(tuple<Node*, float> (new Node(), 3 ));
+    for (vector<Var*>::iterator i = this->nodes.begin(); i != this->nodes.end(); ++i){
+        Var* a = *i;
+        vector<tuple<Var*,float>> ders = findDers(a);
+        // ders.push_back(tuple<Var*, float> (new Var(), 3 ));
         //cout<<a->toString()<<endl;
-        for (vector<tuple<Node*,float>>::iterator k = ders.begin(); k != ders.end(); ++k){
+        for (vector<tuple<Var*,float>>::iterator k = ders.begin(); k != ders.end(); ++k){
             ptrdiff_t pos = distance(nodes.begin(), find(nodes.begin(), nodes.end(), get<0>(*k)));
             Jacobian[pos][j] = get<1>(*k);
             //cout<<pos<<" "<<j<<" "<<get<1>(*k)<<endl;
@@ -391,23 +391,23 @@ double* Node::findDiff(){
         j++;
     }
     //cout<<"sfs"<<endl;
-    for (int i = 0; i < lenNodes; ++i){
+    for (int i = 0; i < lenVars; ++i){
         Jacobian[i][i] = -1;
     }
     /*cout<<"------"<<endl;
-    for (int i = 0; i < lenNodes; ++i){
-        for (int j = 0; j < lenNodes; ++j)
+    for (int i = 0; i < lenVars; ++i){
+        for (int j = 0; j < lenVars; ++j)
         {
             cout<<Jacobian[i][j]<<" ";
         }
         cout<<endl;
     }*/
-    double* y = new double[lenNodes];
-    memset(y, 0, lenNodes*sizeof(double));
-    y[lenNodes-1] = -1;
+    double* y = new double[lenVars];
+    memset(y, 0, lenVars*sizeof(double));
+    y[lenVars-1] = -1;
     //cout<<"------"<<endl;
-    double* x = r8rmat_fs_new (lenNodes, Jacobian, y);
-    /*for (int i = 0; i < lenNodes; ++i)
+    double* x = r8rmat_fs_new (lenVars, Jacobian, y);
+    /*for (int i = 0; i < lenVars; ++i)
     {
         cout<<x[i]<<" ";
     }
@@ -422,7 +422,7 @@ double* Node::findDiff(){
     return out;
 }
 
-string Node::toString(){
+string Var::toString(){
     //cout<<this<<" ";
     
     cout<<get<0>(parents)<<" ";

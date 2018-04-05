@@ -22,6 +22,7 @@ class Node {
     vector<tuple<Node*,float>> derivatives;
     string name;
     float val;
+    float * valList;
     bool is_scalar=false;
     Operation operation;
     tuple<Node*,Node*> parents;
@@ -41,6 +42,7 @@ public:
     bool isScalar(void);
     void setScalar(bool b);
     void setVal(float v);
+    void setVal(float *v);
     float getVal(void);
     void setOperation(Operation operation);
     Operation getOperation(void);
