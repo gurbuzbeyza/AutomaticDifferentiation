@@ -5,6 +5,7 @@
 #include <tuple>
 #include <math.h>
 #include "var.h"
+#include <time.h>
 
 using namespace std;
 
@@ -95,7 +96,40 @@ void printDiffs(Var & v){
 ////////////////////////////////MAIN////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-Var& someCalculations(Var& a, Var& b){
+
+
+
+
+int main(int argc, char const *argv[])
+{
+    clock_t t1 = clock();
+    float x[] = {1,2,3,4,5,10,11,12,13,14};
+    float y[] = {0,0,0,0,0,1,1,1,1,1};
+     
+    Var b0;
+    b0 = 2;
+    Var b1;
+    b1 = 2;
+    Var err;
+    Var p;
+    float alpha = 0.01;
+    for (int i = 0; i < 20; i ++) {
+        int idx = i % 10;
+        p = b0 + b1 * x[idx];
+        err = (p - y[idx])*(p - y[idx]);
+        double* diffs = err.findDiff();
+        //cout<<"afterdiff: \n"<<b0.toString()<<"\n"<<b1.toString()<<"\n"<<err.toString()<<endl;
+        //cout<<diffs[0]<<" "<<diffs[1]<<endl;
+        b0 = b0 - (float)(alpha * diffs[0]);
+        b1 = b1 - (float)(alpha * diffs[1]);
+    }
+    clock_t t2 = clock();
+    cout<<(float)t2-(float)t1<<endl;
+    return 0;
+
+}
+
+/*Var& someCalculations(Var& a, Var& b){
     // res = 0;
     a = 5;
     for (int i = 0; i < 2; ++i)
@@ -120,4 +154,4 @@ int main() {
     // cout<<res.getVal()<<endl;
     printDiffs(res);
     return 0;
-}
+}*/
