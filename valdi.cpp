@@ -13,7 +13,7 @@ Var& pow(const Var& var,const Var&  p){
     Var *newP = (Var*)&p;
     tuple<Var*,Var*> parents (newVar, newP);
     Var* v = new Var(Operation::pow, &parents);
-    return *v->getVar();
+    return *v;
 }
 
 Var&makeUnaryOperation(const Var& var, Operation op){
@@ -21,7 +21,7 @@ Var&makeUnaryOperation(const Var& var, Operation op){
     Var *newP = NULL;
     tuple<Var*,Var*> parents (newVar, newP);
     Var* v = new Var(op, &parents);
-    return *v->getVar();    
+    return *v;    
 }
 
 Var& sqrt(const Var& var)
@@ -60,7 +60,7 @@ Var& makeBinaryScalarOperator(float i, const Var& n, Operation op){
     bs-> setScalar(true);
     tuple<Var*,Var*> parents (bs, newVar);
     Var* v = new Var(op,&parents);
-    return *v ->getVar();
+    return *v;
 }
 
 Var& operator+(float i, const Var& n)
@@ -82,9 +82,9 @@ Var& operator+(const Var& n)
 {    return makeBinaryScalarOperator(1.0,n,Operation::mult);    }
 
 
-void printDiffs(Var & n){
+void printDiffs(Var & v){
 
-    double* fs = n.findDiff();
+    double* fs = v.findDiff();
     cout<<"derivatives: "<<endl;
     for (int i = 0; i < 2; ++i)
     {
@@ -96,7 +96,14 @@ void printDiffs(Var & n){
 ////////////////////////////////////////////////////////////////////////////////
 
 Var& someCalculations(Var& a, Var& b){
-    return a*b;
+    // res = 0;
+    a = 5;
+    for (int i = 0; i < 2; ++i)
+    {
+        a *= b + 2;
+        // cout<<res.toString()<<endl;
+    }
+    return a;
 }
 
 int main() {
@@ -108,11 +115,9 @@ int main() {
     Var res;
     //res = {1,2};
     //
-    res = -a;
-    //res = someCalculations(a,b);
-    a = 5;
+    res = someCalculations(a, b);
     b = 7;
-
+    // cout<<res.getVal()<<endl;
     printDiffs(res);
     return 0;
 }

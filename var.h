@@ -26,8 +26,10 @@ class Var {
     bool is_scalar=false;
     Operation operation;
     tuple<Var*,Var*> parents;
-    void findVals(Var* a);
-    vector<tuple<Var*,float>> findDers(Var* a);
+    float recVars(Var* v);
+    float findVals(Var* a, float left, float right);
+    void recDers(Var* v);
+    void findDers(Var* a);
     // float solveLinEq(float& Jacobian[lenVars][lenVars], Var& n);
 public:
     static vector<Var*> nodes;
@@ -48,6 +50,8 @@ public:
     Operation getOperation(void);
     void setParents(tuple<Var*,Var*> parents);
     tuple<Var*,Var*> getParents(void);
+    Var& makeBinaryVarOperation(const Var& b, Operation op);
+    Var& makeBinaryVarOperation(float i, Operation op);
     Var& operator+(const Var& b);
     Var& operator+(float b);
     Var& operator+(int b);
@@ -64,6 +68,10 @@ public:
     Var& operator=(int b);
     Var& operator=(float b);
     bool operator==(const Var& b);
+    Var& operator+=(const Var& b);
+    Var& operator-=(const Var& b);
+    Var& operator*=(const Var& b);
+    Var& operator/=(const Var& b);
     Var* getVar();
     double* findDiff();
     string toString();
