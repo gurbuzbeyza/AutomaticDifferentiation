@@ -9,6 +9,7 @@ Var::Var(Operation operation, tuple<Var*,Var*>* parents){
     if(NULL==n) {
         this->nodes.push_back(this);
     }
+    // cout<<this->toString()<<endl;
 }
 
 Var::~Var(){}
@@ -92,7 +93,7 @@ Var& Var::operator-(int b)
 {    return makeBinaryVarOperation((float)b, Operation::sub);  }
 
 Var& Var::operator-(float b) 
-{    return makeBinaryVarOperation(b, Operation::add);  }
+{    return makeBinaryVarOperation(b, Operation::sub);  }
 
 // Overload * operator to multiply two Var objects.
 Var& Var::operator*(const Var& b) 
@@ -112,7 +113,7 @@ Var& Var::operator/(int b)
 {    return makeBinaryVarOperation((float)b, Operation::divd);  }
 
 Var& Var::operator/(float b) 
-{    return makeBinaryVarOperation(b, Operation::add);  }
+{    return makeBinaryVarOperation(b, Operation::divd);  }
 
 Var& Var::operator=(const Var& b){
     Var *newB = (Var*)&b;
@@ -406,13 +407,14 @@ void Var::recDers(Var* v){
 
 double* Var::findDiff(){
     int lenInputs = 0;
-    recVars(this);
     for (vector<Var*>::iterator i = this->nodes.begin(); i != this->nodes.end(); ++i){
         Var* a = *i;
+        // cout<<a->toString()<<endl;
         if (NULL == get<0>(a->getParents()) && NULL == get<1>(a->getParents())&& !(a->isScalar())){
             lenInputs++;
         }
     }
+    recVars(this);
     int lenVars = nodes.size();
     double** Jacobian = new double*[lenVars];
     for (int i = 0; i < lenVars; ++i){
@@ -448,6 +450,7 @@ double* Var::findDiff(){
 
     double* x = r8rmat_fs_new (lenVars, Jacobian, y);
     double* out = new double[lenInputs];
+
     for (int i = 0; i < lenInputs; ++i)
     {
         out[i] = x[i];
