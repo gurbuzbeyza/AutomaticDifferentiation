@@ -2,6 +2,7 @@
 #include <cstring>
 vector<Var*> Var::nodes;
 vector<Var*> Var::sortedNodes;
+set<Var*> Var::inputs;
 
 Var::Var(Operation operation, tuple<Var*,Var*>* parents){
     this->operation = operation;
@@ -10,7 +11,12 @@ Var::Var(Operation operation, tuple<Var*,Var*>* parents){
     if(NULL==n) {
         this->nodes.push_back(this);
     }
-    // cout<<this->toString()<<endl;
+    if(get<0>(this->parents) != NULL && get<0>(this->parents)!= NULL){
+        inputList.insert(get<0>(this->parents)->inputList.begin(),get<0>(this->parents)->inputList.end());
+        inputList.insert(get<1>(this->parents)->inputList.begin(),get<1>(this->parents)->inputList.end());
+    }else if(get<0>(this->parents)!= NULL){
+        inputList.insert(get<0>(this->parents)->inputList.begin(),get<0>(this->parents)->inputList.end());
+    }
 }
 
 Var::~Var(){}
@@ -20,6 +26,25 @@ void Var::AddDer(Var* derOf,float der){
     derivatives.push_back(tpl_der);
 }
 
+bool Var::isInput(void){
+    return is_input;
+}
+
+void Var::makeInput(void){
+    is_input = true;
+    inputList.insert(this);
+    //make set empty if needed. but it is empty:D
+    inputs.insert(this);
+}
+
+void Var::setInputList(set<Var*> p1,set<Var*> p2){
+    p1.insert(p2.begin(),p2.end());
+    inputList = p1;
+}
+    
+set<Var*> Var::getInputList(){
+    return inputList;
+}
 void Var::setName(string s){
         name = s;
 }

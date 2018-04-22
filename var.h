@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <set>
 #include <list>
 #include <tuple>
 #include <math.h>
@@ -12,22 +13,25 @@
 #include <stack>
 #include "operation.h"
 #include "solve.hpp"
+#include <set>
 
 
 using namespace std;
-
 
 class Var {
 
     //we should really revise the structure.
     vector<tuple<Var*,float>> derivatives;
     string name;
+    bool is_input = false;
     float val;
     float * valList;
     bool is_scalar = false;
     bool visited = false;
+    set<Var*> inputList;
     Operation operation;
     tuple<Var*,Var*> parents;
+
     float recVars(Var* v);
     void calcVals();
     float findVals(Var* a, float left, float right);
@@ -38,6 +42,7 @@ class Var {
 public:
     static vector<Var*> nodes;
     static vector<Var*> sortedNodes;
+    static set<Var*> inputs;
     Var(Operation operation=Operation::noop, tuple<Var*,Var*>* parents=new tuple<Var*,Var*>);
     ~Var();
     // vector<tuple<Var,float>> GetCopyOfVector();
@@ -47,12 +52,16 @@ public:
 
     string getName(void);
     bool isScalar(void);
+    bool isInput(void);
+    void makeInput(void);
     void setScalar(bool b);
     bool isVisited(void);
     void setVisited(bool b);
     void setVal(float v);
     void setVal(float *v);
     float getVal(void);
+    void setInputList(set<Var*> p1, set<Var*> p2);
+    set<Var*> getInputList(void);
     void setOperation(Operation operation);
     Operation getOperation(void);
     void setParents(tuple<Var*,Var*> parents);
