@@ -290,6 +290,7 @@ float Var::findVals(Var* a, float left, float right){
         case Operation::sqrt :
             return (sqrt(left));
     }
+    return 0;
 }
 
 float Var::recVars(Var* v){
@@ -460,10 +461,10 @@ double* Var::findDiff(){
 
 string Var::toString(){
     //cout<<this<<" ";
-    cout<<this->getVal()<<" ";
-    cout<<get<0>(parents)<<" ";
-    cout<<get<1>(parents)<<" ";
+    // cout<<this->getVal()<<" ";
+    // cout<<get<0>(parents)<<" ";
+    // cout<<get<1>(parents)<<" ";
 
-    return to_string(static_cast<underlying_type<Operation>::type>(this->operation));
+    return to_string(this->getVal());
 }
 

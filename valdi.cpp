@@ -5,6 +5,7 @@
 #include <tuple>
 #include <math.h>
 #include "var.h"
+#include <time.h>
 
 using namespace std;
 
@@ -106,6 +107,11 @@ void printDiffs(Var & v){
 ////////////////////////////////MAIN////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+
+
+
+/*
+
 Var& someCalculations(Var& a, Var& b){
     // res = 0;
     a = 5;
@@ -132,6 +138,7 @@ Var& someCalculations(Var& a, Var& b){
 //     printDiffs(res);
 //     return 0;
 // }
+*/
 
 int main(int argc, char const *argv[])
 {
