@@ -110,18 +110,18 @@ void printDiffs(Var & v){
 
 
 
-/*
 
-Var& someCalculations(Var& a, Var& b){
-    // res = 0;
-    a = 5;
-    for (int i = 0; i < 2; ++i)
-    {
-        a *= b + 2;
-        // cout<<res.toString()<<endl;
-    }
-    return a;
-}
+
+// Var& someCalculations(Var& a, Var& b){
+//     // res = 0;
+//     a = 5;
+//     for (int i = 0; i < 2; ++i)
+//     {
+//         a *= b + 2;
+//         // cout<<res.toString()<<endl;
+//     }
+//     return a;
+// }
 
 // int main() {
 //     /// just try some stuff
@@ -129,16 +129,19 @@ Var& someCalculations(Var& a, Var& b){
 //     //define nodes
 //     Var a;
 //     Var b;
+//     a = 3;
+//     b = 2;
 //     Var res;
 //     //res = {1,2};
 //     //
-//     res = someCalculations(a, b);
+//     res = a + b;
+//     res.result();
 //     b = 7;
 //     // cout<<res.getVal()<<endl;
 //     printDiffs(res);
 //     return 0;
 // }
-*/
+
 
 int main(int argc, char const *argv[])
 {
@@ -157,6 +160,7 @@ int main(int argc, char const *argv[])
     {
         err += pow((b0 + b1 * x[j] - y[j]),2)/2;
     }
+    err.result();
     int i = 0;
     float val0 = 500000;
     float val1 = 500000;

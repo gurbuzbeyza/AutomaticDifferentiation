@@ -1,6 +1,7 @@
 #include "var.h"
 #include <cstring>
 vector<Var*> Var::nodes;
+vector<Var*> Var::sortedNodes;
 
 Var::Var(Operation operation, tuple<Var*,Var*>* parents){
     this->operation = operation;
@@ -40,6 +41,14 @@ void Var::setScalar(bool b){
         is_scalar = b;
 }
 
+bool Var::isVisited(void){
+        return visited;
+}
+
+void Var::setVisited(bool b){
+        visited = b;
+}
+
 float Var::getVal(void){
         return val;
 }
@@ -58,6 +67,37 @@ void Var::setParents(tuple<Var*,Var*> parents){
 
 tuple<Var*,Var*> Var::getParents(void){
     return this->parents;
+}
+
+void Var::topologicalSortUtil(Var* v)
+{
+    // Mark the current node as visited.
+    v->setVisited(true);
+ 
+    // Recur for all the vertices adjacent to this vertex
+    if (NULL != get<0>(v->getParents()) && !get<0>(v->getParents())->isVisited())
+        topologicalSortUtil(get<0>(v->getParents()));
+    if (NULL != get<1>(v->getParents()) && !get<1>(v->getParents())->isVisited())
+        topologicalSortUtil(get<0>(v->getParents()));
+ 
+    // Push current vertex to stack which stores result
+    this->sortedNodes.push_back(v);
+}
+
+void Var::result() {
+ 
+    // Call the recursive helper function to store Topological
+    // Sort starting from all vertices one by one
+    for (vector<Var*>::iterator i = this->nodes.begin(); i != this->nodes.end(); ++i){
+        Var* a = *i;
+        // cout<<a->toString()<<endl;
+        if (!a->isVisited()){
+            topologicalSortUtil(a);
+        }
+    }
+      
+    // Print contents of stack
+    
 }
 
 Var& Var::makeBinaryVarOperation(const Var& b, Operation op){
@@ -200,58 +240,6 @@ Var* Var::getVar(){
     return NULL;
 }
 
-// void Var::findVals(Var* a, Var* left, Var* right){
-//     switch(a->getOperation()) {
-//         case Operation::noop :
-//             if (NULL != get<0>(a->getParents())) {
-//                 a->setVal(get<0>(a->getParents())->getVal());
-//             }
-//             break;
-//         case Operation::add :
-//             a->setVal(get<0>(a->getParents())->getVal() + get<1>(a->getParents())->getVal());
-//             break;
-//         case Operation::sub :
-//             a->setVal(get<0>(a->getParents())->getVal() - get<1>(a->getParents())->getVal());
-//             break;
-//         case Operation::mult :
-//             a->setVal(get<0>(a->getParents())->getVal() * get<1>(a->getParents())->getVal());
-//             break;
-//         case Operation::divd :
-//             a->setVal(get<0>(a->getParents())->getVal() / get<1>(a->getParents())->getVal());
-//             break;
-//         case Operation::sin :
-//             a->setVal(sin(get<0>(a->getParents())->getVal()));
-//             break;
-//         case Operation::cos :
-//             a->setVal(cos(get<0>(a->getParents())->getVal()));
-//             break;
-//         case Operation::tan :
-//             a->setVal(tan(get<0>(a->getParents())->getVal()));
-//             break;
-//         case Operation::asin :
-//             a->setVal(asin(get<0>(a->getParents())->getVal()));
-//             break;
-//         case Operation::acos :
-//             a->setVal(acos(get<0>(a->getParents())->getVal()));
-//             break;
-//         case Operation::atan :
-//             a->setVal(atan(get<0>(a->getParents())->getVal()));
-//             break;
-//         case Operation::exp :
-//             a->setVal(exp(get<0>(a->getParents())->getVal()));
-//             break;
-//         case Operation::log :
-//             a->setVal(log(get<0>(a->getParents())->getVal()));
-//             break;
-//         case Operation::pow :
-//             a->setVal(pow(get<0>(a->getParents())->getVal(), get<1>(a->getParents())->getVal()));
-//             break;
-//         case Operation::sqrt :
-//             a->setVal(sqrt(get<0>(a->getParents())->getVal()));
-//             break;
-//     }
-// }
-
 float Var::findVals(Var* a, float left, float right){
     switch(a->getOperation()) {
         case Operation::noop :
@@ -291,6 +279,19 @@ float Var::findVals(Var* a, float left, float right){
             return (sqrt(left));
     }
     return 0;
+}
+
+void Var::calcVals(){
+    for (vector<Var*>::iterator i = this->nodes.begin(); i != this->nodes.end(); ++i){
+        Var* a = *i;
+        if (NULL != get<0>(a->getParents()) && NULL != get<1>(a->getParents()))
+        {
+            a->setVal(findVals(a, get<0>(a->getParents())->getVal(), get<1>(a->getParents())->getVal()));
+        }
+        else if (NULL != get<0>(a->getParents()) && NULL == get<1>(a->getParents())) {
+           a->setVal(findVals(a, get<0>(a->getParents())->getVal(), -1)); 
+        }
+    }
 }
 
 float Var::recVars(Var* v){
@@ -415,7 +416,7 @@ double* Var::findDiff(){
             lenInputs++;
         }
     }
-    recVars(this);
+    calcVals();
     int lenVars = nodes.size();
     double** Jacobian = new double*[lenVars];
     for (int i = 0; i < lenVars; ++i){
