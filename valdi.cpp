@@ -94,15 +94,15 @@ Var& operator+(const Var& n)
 {    return makeBinaryScalarOperator(1.0,n,Operation::add);    }
 
 
-void printDiffs(Var & v){
+// void printDiffs(Var & v){
 
-    double* fs = v.findDiff();
-    cout<<"derivatives: "<<endl;
-    for (int i = 0; i < 2; ++i)
-    {
-            cout<<i<<": "<<fs[i]<<endl;
-    }
-}
+//     double* fs = v.findDiff();
+//     cout<<"derivatives: "<<endl;
+//     for (int i = 0; i < 2; ++i)
+//     {
+//             cout<<i<<": "<<fs[i]<<endl;
+//     }
+// }
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////MAIN////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -145,24 +145,36 @@ void printDiffs(Var & v){
 
 int main(int argc, char const *argv[])
 {
-    Var x,y,z,t;
-    x.makeInput();
+    Var a0,a1,a2,res;
+    // a0.makeInput();
     //y = x;
-    z.makeInput();
-    t=z+x;
-    y+=z;
-    y=t+z;
-    //cout<<<<endl;
-    cout<<"# total inputs: "<<t.inputs.size()<<endl;
-    cout<<"# depInps to x: "<<x.getDependentInputs().size()<<endl;
-    cout<<"# depInps to y: "<<y.getDependentInputs().size()<<endl;
-    cout<<"# depInps to z: "<<z.getDependentInputs().size()<<endl;
-    cout<<"# depInps to t: "<<t.getDependentInputs().size()<<endl;
+    a1.makeInput();
+    
+    // a2.makeInput();
 
-    for (vector<Var*>::iterator i = x.nodes.begin(); i != x.nodes.end(); ++i){
-        Var* a = *i;
-        cout<<a->getVal()<<" "<<a->getDependentInputs().size()<<endl;
-    }
+    res = 3*a1 + a1;
+    // a0 = 1;
+    a1 = 2;
+    // a2 = 3;
+    //cout<<<<endl;
+    cout<<"# total inputs: "<<a0.inputs.size()<<endl;
+    // cout<<"# depInps to a0: "<<a0.getDependentInputs().size()<<endl;
+    cout<<"# depInps to a1: "<<a1.getDependentInputs().size()<<endl;
+    // cout<<"# depInps to a2: "<<a2.getDependentInputs().size()<<endl;
+    cout<<"# depInps to res: "<<res.getDependentInputs().size()<<endl;
+    res.result();
+    map<Var*, float> diffs = res.findDiff();
+    map<float, float> newMap;
+    // cout<<diffs.at(&a0)<<endl;
+    cout<<diffs.at(&a1)<<endl;
+    // cout<<diffs.at(&a2)<<endl;
+    // cout<<res.findDiff().find(a1)<<endl;
+    // cout<<res.findDiff().find(a2)<<endl;
+
+    // for (vector<Var*>::iterator i = x.nodes.begin(); i != x.nodes.end(); ++i){
+    //     Var* a = *i;
+    //     cout<<a->getVal()<<" "<<a->getDependentInputs().size()<<endl;
+    // }
     /*clock_t t1 = clock();
     float x[] = {1.0, 2.0, 3.0, 4.0, 5.0};
     float y[] = {2.0, 5.0, 5.0, 8.0, 11.0};

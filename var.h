@@ -35,7 +35,8 @@ class Var {
     float recVars(Var* v);
     void calcVals();
     float findVals(Var* a, float left, float right);
-    void recDers(Var* v);
+    map<Var*, float> recDers(Var* v, map<Var*, float>& derivs);
+    void calcDers(map<Var*, float>& derivs);
     void findDers(Var* a);
     void topologicalSortUtil(Var* v);
     // float solveLinEq(float& Jacobian[lenVars][lenVars], Var& n);
@@ -49,7 +50,6 @@ public:
     void AddDer(Var* derOf,float der);
     // void DisplayDerValues();
     void setName(string s);
-
     string getName(void);
     bool isScalar(void);
     bool isInput(void);
@@ -68,6 +68,7 @@ public:
     void setParents(tuple<Var*,Var*> parents);
     void result();
     tuple<Var*,Var*> getParents(void);
+    vector<tuple<Var*,float>> getDerivatives(void);
     Var& makeBinaryVarOperation(const Var& b, Operation op);
     Var& makeBinaryVarOperation(float i, Operation op);
     Var& operator+(const Var& b);
@@ -91,7 +92,7 @@ public:
     Var& operator*=(const Var& b);
     Var& operator/=(const Var& b);
     Var* getVar();
-    double* findDiff();
+    map<Var*, float> findDiff();
     string toString();
 
 };
