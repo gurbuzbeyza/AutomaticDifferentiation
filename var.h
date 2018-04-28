@@ -35,8 +35,9 @@ class Var {
     float recVars(Var* v);
     void calcVals();
     float findVals(Var* a, float left, float right);
-    map<Var*, float> recDers(Var* v, map<Var*, float>& derivs);
-    void calcDers(map<Var*, float>& derivs);
+    void calcDers(map<Var*,float>& derivs);
+    map<Var*, float> calcDers(Var* v);
+    //map<Var*, float> calcDers(Var* v, map<Var*, float>& derivs,map<Var*, float> locDers);
     void findDers(Var* a);
     void topologicalSortUtil(Var* v);
     // float solveLinEq(float& Jacobian[lenVars][lenVars], Var& n);

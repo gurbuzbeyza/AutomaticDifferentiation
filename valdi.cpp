@@ -148,16 +148,19 @@ int main(int argc, char const *argv[])
     Var a0,a1,a2,res;
     // a0.makeInput();
     //y = x;
+    a0.makeInput();
     a1.makeInput();
-    
+    a2.makeInput();
+
     // a2.makeInput();
 
-    res = 3*a1 + a1;
-    // a0 = 1;
-    a1 = 2;
+    res = 2*a1+a0*a2+a1-a2*a1;// + a1;
+    a0 = 1;
+    a1 = 25;
+    a2=10;
     // a2 = 3;
     //cout<<<<endl;
-    cout<<"# total inputs: "<<a0.inputs.size()<<endl;
+    cout<<"# total inputs: "<<a1.inputs.size()<<endl;
     // cout<<"# depInps to a0: "<<a0.getDependentInputs().size()<<endl;
     cout<<"# depInps to a1: "<<a1.getDependentInputs().size()<<endl;
     // cout<<"# depInps to a2: "<<a2.getDependentInputs().size()<<endl;
@@ -165,8 +168,9 @@ int main(int argc, char const *argv[])
     res.result();
     map<Var*, float> diffs = res.findDiff();
     map<float, float> newMap;
-    // cout<<diffs.at(&a0)<<endl;
+    cout<<diffs.at(&a0)<<endl;
     cout<<diffs.at(&a1)<<endl;
+    cout<<diffs.at(&a2)<<endl;
     // cout<<diffs.at(&a2)<<endl;
     // cout<<res.findDiff().find(a1)<<endl;
     // cout<<res.findDiff().find(a2)<<endl;
