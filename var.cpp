@@ -11,7 +11,7 @@ Var::Var(Operation operation, tuple<Var*,Var*>* parents){
     if(NULL==n) {
         this->nodes.push_back(this);
     }
-    if(get<0>(this->parents) != NULL && get<0>(this->parents)!= NULL){
+    if(get<0>(this->parents) != NULL && get<1>(this->parents)!= NULL){
         this->dependentInputs.insert(get<0>(this->parents)->dependentInputs.begin(),get<0>(this->parents)->dependentInputs.end());
         this->dependentInputs.insert(get<1>(this->parents)->dependentInputs.begin(),get<1>(this->parents)->dependentInputs.end());
     }else if(get<0>(this->parents)!= NULL){
