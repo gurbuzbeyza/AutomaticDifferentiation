@@ -49,6 +49,7 @@ public:
     ~Var();
     // vector<tuple<Var,float>> GetCopyOfVector();
     void AddDer(Var* derOf,float der);
+    void ClearDers();
     // void DisplayDerValues();
     void setName(string s);
     string getName(void);

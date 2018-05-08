@@ -145,40 +145,23 @@ Var& operator+(const Var& n)
 
 int main(int argc, char const *argv[])
 {
-    // Var a0,a1,a2,res;
-    // // a0.makeInput();
-    // //y = x;
-    // a0.makeInput();
-    // a1.makeInput();
-    // a2.makeInput();
+    /*Var xx;
+    xx.makeInput();
+    xx=50;
+    Var f;
+    f =xx+xx;
+    f.result();
+    map<Var*, float> diffs = f.findDiff();
+    cout<<"f: "<<f.getVal()<<endl;
+    cout<<"xx: "<<xx.getVal()<<endl;
+    cout<<"diff xx:   "<<diffs.at(&xx)<<endl;
 
-    // // a2.makeInput();
+    diffs = f.findDiff();
+    cout<<"f: "<<f.getVal()<<endl;
+    cout<<"xx: "<<xx.getVal()<<endl;
 
-    // res = 2*a1+a0*a2+a1-a2*a1;// + a1;
-    // a0 = 1;
-    // a1 = 25;
-    // a2=10;
-    // // a2 = 3;
-    // //cout<<<<endl;
-    // cout<<"# total inputs: "<<a1.inputs.size()<<endl;
-    // // cout<<"# depInps to a0: "<<a0.getDependentInputs().size()<<endl;
-    // cout<<"# depInps to a1: "<<a1.getDependentInputs().size()<<endl;
-    // // cout<<"# depInps to a2: "<<a2.getDependentInputs().size()<<endl;
-    // cout<<"# depInps to res: "<<res.getDependentInputs().size()<<endl;
-    // res.result();
-    // map<Var*, float> diffs = res.findDiff();
-    // map<float, float> newMap;
-    // cout<<diffs.at(&a0)<<endl;
-    // cout<<diffs.at(&a1)<<endl;
-    // cout<<diffs.at(&a2)<<endl;
-    // cout<<diffs.at(&a2)<<endl;
-    // cout<<res.findDiff().find(a1)<<endl;
-    // cout<<res.findDiff().find(a2)<<endl;
-
-    // for (vector<Var*>::iterator i = x.nodes.begin(); i != x.nodes.end(); ++i){
-    //     Var* a = *i;
-    //     cout<<a->getVal()<<" "<<a->getDependentInputs().size()<<endl;
-    // }
+    cout<<"diff xx:   "<<diffs.at(&xx)<<endl;
+    */
     clock_t t1 = clock();
     float x[] = {1.0, 2.0, 3.0, 4.0, 5.0};
     float y[] = {2.0, 5.0, 5.0, 8.0, 11.0};
@@ -192,24 +175,24 @@ int main(int argc, char const *argv[])
     Var err;
     err = 0;
     float alpha = 0.001;
-    // for (int j = 0; j < 2; ++j)
-    // {
-    //     err += pow((b0 + b1 * x[j] - y[j]),2)/2;
-    // }
+    for (int j = 0; j < 5; ++j)
+     {
+         err += pow((b0 + b1 * x[j] - y[j]),2)/2;
+     }
     err = pow((b0 + b1 * x[1] - y[1]),2)/2 + pow((b0 + b1 * x[0] - y[0]),2)/2;
     err.result();
     int i = 0;
     float val0 = 500000;
     float val1 = 500000;
 
-    for (int i = 0; i<10; i++){
+    while(true){
         map<Var*, float> diffs = err.findDiff();
-        cout<<"sdgdfgd"<<diffs.at(&b0)<<"  "<<diffs.at(&b1)<<endl;
+        //cout<<"sdgdfgd"<<diffs.at(&b0)<<"  "<<diffs.at(&b1)<<endl;
         val0 = b0.getVal() - (float)(alpha * diffs.at(&b0));
         val1 = b1.getVal() - (float)(alpha * diffs.at(&b1));
-        if (abs(b0.getVal() - val0) < 0.0001 && abs(b1.getVal() - val1) < 0.0001)
+        if (abs(b0.getVal() - val0) < 0.000001 && abs(b1.getVal() - val1) < 0.000001)
             break;
-        cout<<abs(b0.getVal())<<"  "<<abs(b1.getVal())<<endl;
+        //cout<<abs(b0.getVal())<<"  "<<abs(b1.getVal())<<endl;
         b0 = val0;
         b1 = val1;
     }
@@ -217,7 +200,6 @@ int main(int argc, char const *argv[])
     cout<<i<<endl;
     clock_t t2 = clock();
     cout<<(float)t2-(float)t1<<endl;
-    
 
     return 0;
 

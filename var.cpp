@@ -25,6 +25,9 @@ void Var::AddDer(Var* derOf,float der){
     tuple<Var*,float> tpl_der (derOf,der);
     derivatives.push_back(tpl_der);
 }
+void Var::ClearDers(){
+    derivatives.clear();
+}
 
 bool Var::isInput(void){
     return is_input;
@@ -140,9 +143,13 @@ void Var::result() {
 }
 
 Var& Var::makeBinaryVarOperation(const Var& b, Operation op){
+    //cout<<"binaryvarop"<<endl;
     Var *newB = (Var*)&b;
+    //cout<<"input: "<<newB->getVal()<<"this: "<<this->getVal()<<"op: "<<endl;
     tuple<Var*,Var*> parents (this, newB);
     Var* v = new Var(op, &parents);
+    v->setVal(newB->getVal());
+    //cout<<"return:"<<v->getVal()<<endl;
     return *v;    
 }
 
@@ -195,9 +202,12 @@ Var& Var::operator/(float b)
 {    return makeBinaryVarOperation(b, Operation::divd);  }
 
 Var& Var::operator=(const Var& b){
+    //cout<<" == op"<<endl;
     Var *newB = (Var*)&b;
+    //cout<<" this val coming: "<<newB->getVal()<<endl;
     if (this == get<0>(newB->parents))
     {
+        //cout<<" this is 0 par"<<endl;
         Var* bs = new Var((get<0>(newB->parents))->getOperation(), &((get<0>(newB->parents))->parents));
         bs->setVal((get<0>(newB->parents))->getVal());
         if ((NULL != get<0>(bs->parents))||(NULL != get<1>(bs->parents)))
@@ -207,6 +217,7 @@ Var& Var::operator=(const Var& b){
         get<0>(newB->parents) = bs;
     }
     else if (this == get<1>(newB->parents)) {
+        //cout<<" this is 1 par"<<endl;
         Var* bs = new Var((get<1>(newB->parents))->getOperation(), &((get<1>(newB->parents))->parents));
         bs->setVal((get<1>(newB->parents))->getVal());
         if ((NULL != get<0>(bs->parents))||(NULL != get<1>(bs->parents)))
@@ -219,6 +230,8 @@ Var& Var::operator=(const Var& b){
     tuple<Var*,Var*> parents (newB, NULL);
     this->setParents(parents);
     this->setDependentInputs(newB->getDependentInputs());
+    //cout<<" this val: "<<this->getVal()<<endl;
+
     return *this;
 }
 
@@ -323,7 +336,7 @@ float Var::findVals(Var* a, float left, float right){
 }
 
 void Var::calcVals(){
-    for (vector<Var*>::iterator i = this->nodes.begin(); i != this->nodes.end(); ++i){
+    for (vector<Var*>::iterator i = this->sortedNodes.begin(); i != this->sortedNodes.end(); ++i){
         Var* a = *i;
         if (NULL != get<0>(a->getParents()) && NULL != get<1>(a->getParents()))
         {
@@ -435,74 +448,15 @@ void Var::findDers(Var* a){
 }
 
 
-// map<Var*, float> Var::recDers(Var* v, map<Var*, float>& derivs){
-//     findDers (v);
-//     cout<<"loop"<<endl;
-//     map<Var*, float> dersLoc;
-//     for (set<Var*>::iterator i = v->dependentInputs.begin(); i != v->dependentInputs.end(); ++i){
-//         Var* a = *i;
-//         // derivs[a] = 1;
-//         dersLoc[a] = 0;
-//         if (NULL != get<0>(v->getParents()) && get<0>(v->getParents())->dependentInputs.find(a) != get<0>(v->getParents())->dependentInputs.end())
-//         {
-//             dersLoc[a] += get<1>(v->getDerivatives()[0]);
-//         }
-//         // cout<<derivs[a]<<endl;
-//     }
-//     for (set<Var*>::iterator i = v->dependentInputs.begin(); i != v->dependentInputs.end(); ++i){
-//         Var* a = *i;
-//         // derivs[a] = 1;
-//         if (NULL != get<1>(v->getParents()) && get<1>(v->getParents())->dependentInputs.find(a) != get<1>(v->getParents())->dependentInputs.end())
-//         {
-//             dersLoc[a] += get<1>(v->getDerivatives()[1]);
-//         }
-//         // cout<<derivs[a]<<endl;
-//     }
-//     map<Var*, float> x = recDers (get<0>(v->getParents()), derivs);
-//     recDers (get<1>(v->getParents()), derivs);
-//     for (set<Var*>::iterator i = v->dependentInputs.begin(); i != v->dependentInputs.end(); ++i){
-//         Var* a = *i;
-//         derivs[a] = dersLoc[a]*x[a];
-//     }
-// }
-
- /*void Var::calcDers(map<Var*, float>& derivs){
-    map<Var*, float> dersLoc;
-    for (set<Var*>::iterator i = this->dependentInputs.begin(); i != this->dependentInputs.end(); ++i){
-        Var* a = *i;
-        dersLoc[a] = 1;
-    }
-     for (vector<Var*>::reverse_iterator i = this->sortedNodes.rbegin(); i != this->sortedNodes.rend(); ++i){
-         Var* a = *i;
-         cout<<a->isInput()<<" isinpt"<<endl;
-         findDers (a);
-         if (NULL != get<0>(a->getParents())) {
-             for (set<Var*>::iterator j = get<0>(a->getParents())->dependentInputs.begin(); j != get<0>(a->getParents())->dependentInputs.end(); ++j){
-                // dersLoc[*j] = 1;
-                 dersLoc[*j] *= get<1>(a->getDerivatives()[0]);
-                 cout<<*j<<" ="<<get<1>(a->getDerivatives()[0])<<endl;
-             }
-         }
-         if (NULL != get<1>(a->getParents())) {
-            for (set<Var*>::iterator j = get<1>(a->getParents())->dependentInputs.begin(); j != get<1>(a->getParents())->dependentInputs.end(); ++j){
-                // dersLoc[j] = 1;
-                 dersLoc[*j] *= get<1>(a->getDerivatives()[1]);
-                 cout<<*j<<" *="<<get<1>(a->getDerivatives()[1])<<endl;
-             }
-         }
-         if (a->isInput()){
-            cout<<a<<" "<<dersLoc[a]<<" add to input cur total: "<< derivs[a]<<endl;
-            derivs[a]+=dersLoc[a];
-         }
-     }
- }*/
-
 void Var::calcDers(map<Var*,float>& derivs){//base
+    //cout<<"derivs:::::"<<endl;
     derivs = this->calcDers(this);
 }
 
 map<Var*, float> Var::calcDers(Var* v){//base
+    v->ClearDers();
     findDers(v);
+    //cout<<"findDers of val: "<<v->getVal()<<" num ders: "<<v->getDerivatives().size()<<endl;
     map<Var*,float> newDers;
     if(get<0>(v->getParents())==NULL && v->isInput()){
         newDers[v] = 1;
@@ -513,18 +467,24 @@ map<Var*, float> Var::calcDers(Var* v){//base
         return curDers;
     }
     if(get<0>(v->getParents())!=NULL){
+        //cout<<"iter00:"<<endl;
         curDers = calcDers(get<0>(v->getParents()));
         map<Var*, float>::iterator it;
+        //cout<<"iter01:"<<endl;
         for ( it = curDers.begin(); it != curDers.end(); it++ )
         {
+            //cout<<(it->second)<<" * "<<get<1>(v->getDerivatives()[0])<<endl;
             newDers[it->first] = (it->second)*get<1>(v->getDerivatives()[0]);
         }
     }
     if(get<1>(v->getParents())!=NULL){
+        //cout<<"iter10:"<<endl;
         curDers = calcDers(get<1>(v->getParents()));
         map<Var*, float>::iterator it;
+        //cout<<"iter11:"<<endl;
         for ( it = curDers.begin(); it != curDers.end(); it++ )
         {
+            //cout<<(it->second)<<" * "<<get<1>(v->getDerivatives()[1])<<endl;
             newDers[it->first] += (it->second)*get<1>(v->getDerivatives()[1]);
         }
     }
@@ -602,66 +562,10 @@ map<Var*, float> Var::calcDers(Var* v){//base
 
 
 map<Var*, float> Var::findDiff(){
-    // for (vector<Var*>::iterator i = this->nodes.begin(); i != this->nodes.end(); ++i){
-    //     Var* a = *i;
-    //     // cout<<a->toString()<<endl;
-    //     if (NULL == get<0>(a->getParents()) && NULL == get<1>(a->getParents())&& !(a->isScalar())){
-    //         lenInputs++;
-    //     }
-    // }
-    //int lenInputs = this->inputs.size();
+
     calcVals();
-    //int lenVars = nodes.size();
-    // double** Jacobian = new double*[lenVars];
-    // for (int i = 0; i < lenVars; ++i){
-    //     Jacobian[i] = new double[lenVars];
-    //     for (int j = 0; j < lenVars; ++j)
-    //     {
-    //         Jacobian[i][j] = 0;
-    //     }
-    // }
-    // for (int i = 0; i < lenVars; ++i){
-    //     Jacobian[i][i] = -1;
-    // }
     map<Var*, float> derivs;
-    //map<Var*, float> locDers;
-    /*for (set<Var*>::iterator i = this->inputs.begin(); i != this->inputs.end(); ++i){
-        Var* a = *i;
-        derivs[a] = 0;
-        //locDers[a] = 0;
-    }
-    for (set<Var*>::iterator i = this->dependentInputs.begin(); i != this->dependentInputs.end(); ++i){
-        Var* a = *i;
-        derivs[a] = 0;//?1?
-        //locDers[a] = 1;
-    }*/
     calcDers(derivs);
-    // for (vector<Var*>::iterator i = this->nodes.begin(); i != this->nodes.end(); ++i){
-    //     Var* a = *i;
-    //     vector<tuple<Var*,float>> ders = a->derivatives;
-    //     for (vector<tuple<Var*,float>>::iterator k = ders.begin(); k != ders.end(); ++k){
-    //         ptrdiff_t pos = distance(nodes.begin(), find(nodes.begin(), nodes.end(), get<0>(*k)));
-    //         Jacobian[pos][j] = get<1>(*k);
-    //         // cout<<pos<<" "<<j<<" "<<get<1>(*k)<<endl;
-    //     }
-    //     j++;
-    // }
-    // for (int i = 0; i < lenVars; ++i){
-    //     Jacobian[i][i] = -1;
-    // }
-
-    // double* y = new double[lenVars];
-    // memset(y, 0, lenVars*sizeof(double));
-    // ptrdiff_t pos = distance(nodes.begin(), find(nodes.begin(), nodes.end(), this));
-    // y[pos] = -1;
-
-    // double* x = r8rmat_fs_new (lenVars, Jacobian, y);
-    // double* out = new double[lenInputs];
-
-    // for (int i = 0; i < lenInputs; ++i)
-    // {
-    //     out[i] = x[i];
-    // }
     return derivs;
 }
 
