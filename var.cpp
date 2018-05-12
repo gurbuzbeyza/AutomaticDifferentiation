@@ -110,9 +110,9 @@ void Var::topologicalSortUtil(Var* v)
     v->setVisited(true);
  
     // Recur for all the vertices adjacent to this vertex
-    if (NULL != get<0>(v->getParents()) && !get<0>(v->getParents())->isVisited())
+    if (get<0>(v->getParents()) != NULL && !get<0>(v->getParents())->isVisited())
         topologicalSortUtil(get<0>(v->getParents()));
-    if (NULL != get<1>(v->getParents()) && !get<1>(v->getParents())->isVisited())
+    if (get<1>(v->getParents()) != NULL && !get<1>(v->getParents())->isVisited())
         topologicalSortUtil(get<0>(v->getParents()));
  
     // Push current vertex to stack which stores result
@@ -125,31 +125,24 @@ void Var::result() {
     // Sort starting from all vertices one by one
     for (set<Var*>::iterator i = this->inputs.begin(); i != this->inputs.end(); ++i){
         Var* a = *i;
-        // cout<<a->toString()<<endl;
         a->setVisited(true);
         this->sortedNodes.push_back(a);
     }
     for (vector<Var*>::iterator i = this->nodes.begin(); i != this->nodes.end(); ++i){
         Var* a = *i;
-        // cout<<a->toString()<<endl;
 
         if (!a->isVisited()){
             topologicalSortUtil(a);
         }
     }
-      
-    // Print contents of stack
-    
+          
 }
 
 Var& Var::makeBinaryVarOperation(const Var& b, Operation op){
-    //cout<<"binaryvarop"<<endl;
     Var *newB = (Var*)&b;
-    //cout<<"input: "<<newB->getVal()<<"this: "<<this->getVal()<<"op: "<<endl;
     tuple<Var*,Var*> parents (this, newB);
     Var* v = new Var(op, &parents);
     v->setVal(newB->getVal());
-    //cout<<"return:"<<v->getVal()<<endl;
     return *v;    
 }
 
@@ -202,25 +195,21 @@ Var& Var::operator/(float b)
 {    return makeBinaryVarOperation(b, Operation::divd);  }
 
 Var& Var::operator=(const Var& b){
-    //cout<<" == op"<<endl;
     Var *newB = (Var*)&b;
-    //cout<<" this val coming: "<<newB->getVal()<<endl;
     if (this == get<0>(newB->parents))
     {
-        //cout<<" this is 0 par"<<endl;
         Var* bs = new Var((get<0>(newB->parents))->getOperation(), &((get<0>(newB->parents))->parents));
         bs->setVal((get<0>(newB->parents))->getVal());
-        if ((NULL != get<0>(bs->parents))||(NULL != get<1>(bs->parents)))
+        if ((get<0>(bs->parents) != NULL)||(get<1>(bs->parents) != NULL))
         {
             this->nodes.push_back(bs);
         }
         get<0>(newB->parents) = bs;
     }
     else if (this == get<1>(newB->parents)) {
-        //cout<<" this is 1 par"<<endl;
         Var* bs = new Var((get<1>(newB->parents))->getOperation(), &((get<1>(newB->parents))->parents));
         bs->setVal((get<1>(newB->parents))->getVal());
-        if ((NULL != get<0>(bs->parents))||(NULL != get<1>(bs->parents)))
+        if ((get<0>(bs->parents) != NULL)||(get<1>(bs->parents) != NULL))
         {
             this->nodes.push_back(bs);
         }
@@ -230,7 +219,6 @@ Var& Var::operator=(const Var& b){
     tuple<Var*,Var*> parents (newB, NULL);
     this->setParents(parents);
     this->setDependentInputs(newB->getDependentInputs());
-    //cout<<" this val: "<<this->getVal()<<endl;
 
     return *this;
 }
@@ -257,7 +245,7 @@ bool Var::operator==(const Var& b){
     else if(this->operation != newB->operation){
         return false;
     }
-    else if((NULL == get<0>(this->parents))&&(NULL == get<1>(this->parents))){
+    else if((get<0>(this->parents)) == NULL && (get<1>(this->parents)) == NULL){
         return false;
     }
     return true;
@@ -338,11 +326,11 @@ float Var::findVals(Var* a, float left, float right){
 void Var::calcVals(){
     for (vector<Var*>::iterator i = this->sortedNodes.begin(); i != this->sortedNodes.end(); ++i){
         Var* a = *i;
-        if (NULL != get<0>(a->getParents()) && NULL != get<1>(a->getParents()))
+        if (get<0>(a->getParents()) != NULL && get<1>(a->getParents()) != NULL)
         {
             a->setVal(findVals(a, get<0>(a->getParents())->getVal(), get<1>(a->getParents())->getVal()));
         }
-        else if (NULL != get<0>(a->getParents()) && NULL == get<1>(a->getParents())) {
+        else if (get<0>(a->getParents()) != NULL && get<1>(a->getParents()) == NULL) {
            a->setVal(findVals(a, get<0>(a->getParents())->getVal(), -1)); 
         }
     }
@@ -351,14 +339,13 @@ void Var::calcVals(){
 float Var::recVars(Var* v){
     if (v == NULL)
     {
-        // cout<<"sdfs"<<endl;
         return -1;
     }
-    if (NULL == get<0>(v->getParents()) && NULL == get<1>(v->getParents()))
+    if (get<0>(v->getParents()) == NULL && get<1>(v->getParents()) == NULL)
     {
         return v->getVal();
     }
-    if (NULL == get<1>(v->getParents()))
+    if (get<1>(v->getParents()) == NULL)
     {
         float val = findVals(v, recVars(get<0>(v->getParents())), -1);
         v->setVal(val);
@@ -373,7 +360,7 @@ void Var::findDers(Var* a){
     //TODO scalar operations may be added later
     switch(a->getOperation()){
         case Operation::noop :
-            if (NULL != get<0>(a->getParents())) {
+            if (get<0>(a->getParents()) != NULL) {
                 a->AddDer(get<0>(a->getParents()),1);
             }
             else {
@@ -456,7 +443,6 @@ void Var::calcDers(map<Var*,float>& derivs){//base
 map<Var*, float> Var::calcDers(Var* v){//base
     v->ClearDers();
     findDers(v);
-    //cout<<"findDers of val: "<<v->getVal()<<" num ders: "<<v->getDerivatives().size()<<endl;
     map<Var*,float> newDers;
     if(get<0>(v->getParents())==NULL && v->isInput()){
         newDers[v] = 1;
@@ -467,97 +453,23 @@ map<Var*, float> Var::calcDers(Var* v){//base
         return curDers;
     }
     if(get<0>(v->getParents())!=NULL){
-        //cout<<"iter00:"<<endl;
         curDers = calcDers(get<0>(v->getParents()));
         map<Var*, float>::iterator it;
-        //cout<<"iter01:"<<endl;
         for ( it = curDers.begin(); it != curDers.end(); it++ )
         {
-            //cout<<(it->second)<<" * "<<get<1>(v->getDerivatives()[0])<<endl;
             newDers[it->first] = (it->second)*get<1>(v->getDerivatives()[0]);
         }
     }
     if(get<1>(v->getParents())!=NULL){
-        //cout<<"iter10:"<<endl;
         curDers = calcDers(get<1>(v->getParents()));
         map<Var*, float>::iterator it;
-        //cout<<"iter11:"<<endl;
         for ( it = curDers.begin(); it != curDers.end(); it++ )
         {
-            //cout<<(it->second)<<" * "<<get<1>(v->getDerivatives()[1])<<endl;
             newDers[it->first] += (it->second)*get<1>(v->getDerivatives()[1]);
         }
     }
     return newDers;
 }
-
-
-/*map<Var*, float> Var::calcDers(map<Var*,float>& derivs, map<Var*,float>& locDers,Var* v){//base
-    v.findDiff();
-    if(get<0>(v->getParents())==NULL && v->isInput()){
-        //derivs[v] += locDers[v];
-        return locDers;
-    }
-    map<Var*,float> newDers;
-    if(get<0>(v->getParents())!=NULL){
-        newDers = calcDers(derivs,locDers,v->get<0>(getParents()));
-           
-    }
-    if(get<1>(v->getParents())!=NULL){
-        newDers += calcDers(derivs,locDers,v->get<1>(getParents()));
-    }
-    for (set<Var*>::iterator i = v->getDependentInputs().begin(); i != v->getDependentInputs().end(); ++i){
-            Var* a = *i;
-            locDers[a] *= newDers[a];
-    }
-}*/
-
-/*map<Var*, float> Var::calcDers(Var* v, map<Var*, float>& derivs,map<Var*, float> locDers){
-    findDers (v);
-    if (get<0>(v->getParents()) == NULL &&  get<1>(v->getParents()) == NULL )
-    {
-        for (set<Var*>::iterator i = v->getDependentInputs().begin(); i != v->getDependentInputs().end(); ++i){
-            Var* a = *i;
-            locDers[a] *= get<1>(a->getDerivatives()[0]);
-            derivs[a] += locDers[a];
-        }
-        return locDers;
-    }
-    if (get<1>(v->getParents()) == NULL)//one parent only
-    {
-        for (set<Var*>::iterator i = v->getDependentInputs().begin(); i != v->getDependentInputs().end(); ++i){
-            Var* a = *i;
-            locDers[a] *= get<1>(a->getDerivatives()[0]);
-            locDers[a]*=calcDers(a,derivs,locDers)[a];
-        }
-    }
-    else//2 parents
-    {
-        map<Var*, float> locDer1;
-        map<Var*, float> locDer2;
-        map<Var*, float> locDerSum;
-        for (set<Var*>::iterator i = v->getDependentInputs().begin(); i != v->getDependentInputs().end(); ++i){
-            Var* a = *i;
-            locDerSum[a] =1;
-        }
-        for (set<Var*>::iterator i = get<0>(v->getParents())->getDependentInputs().begin(); i != get<0>(v->getParents())->getDependentInputs().end(); ++i){
-            Var* a = *i;
-            locDer1[a] = get<1>(a->getDerivatives()[0]);
-            locDer1[a]*=calcDers(a,derivs,locDer2)[a];
-            locDerSum[a]=locDer1[a];
-        }
-        for (set<Var*>::iterator i = get<1>(v->getParents())->getDependentInputs().begin(); i != get<1>(v->getParents())->getDependentInputs().end(); ++i){
-            Var* a = *i;
-            locDer2[a] *= get<1>(a->getDerivatives()[0]);
-            locDer2[a]*=calcDers(a,derivs,locDer2)[a];
-            locDerSum[a]+=locDer2[a];
-        }
-        for (set<Var*>::iterator i = v->getDependentInputs().begin(); i != v->getDependentInputs().end(); ++i){
-            Var* a = *i;
-            locDers[a]*=locDerSum[a];
-        }
-    }
-}*/
 
 
 
@@ -570,10 +482,9 @@ map<Var*, float> Var::findDiff(){
 }
 
 string Var::toString(){
-    //cout<<this<<" ";
-    // cout<<this->getVal()<<" ";
-    // cout<<get<0>(parents)<<" ";
-    // cout<<get<1>(parents)<<" ";
+    cout<<this->getVal()<<" ";
+    cout<<get<0>(parents)<<" ";
+    cout<<get<1>(parents)<<" ";
 
     return to_string(this->getVal());
 }

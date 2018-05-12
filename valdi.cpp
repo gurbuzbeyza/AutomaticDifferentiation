@@ -94,15 +94,7 @@ Var& operator+(const Var& n)
 {    return makeBinaryScalarOperator(1.0,n,Operation::add);    }
 
 
-// void printDiffs(Var & v){
 
-//     double* fs = v.findDiff();
-//     cout<<"derivatives: "<<endl;
-//     for (int i = 0; i < 2; ++i)
-//     {
-//             cout<<i<<": "<<fs[i]<<endl;
-//     }
-// }
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////MAIN////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -110,58 +102,8 @@ Var& operator+(const Var& n)
 
 
 
-
-
-// Var& someCalculations(Var& a, Var& b){
-//     // res = 0;
-//     a = 5;
-//     for (int i = 0; i < 2; ++i)
-//     {
-//         a *= b + 2;
-//         // cout<<res.toString()<<endl;
-//     }
-//     return a;
-// }
-
-// int main() {
-//     /// just try some stuff
-
-//     //define nodes
-//     Var a;
-//     Var b;
-//     a = 3;
-//     b = 2;
-//     Var res;
-//     //res = {1,2};
-//     //
-//     res = a + b;
-//     res.result();
-//     b = 7;
-//     // cout<<res.getVal()<<endl;
-//     printDiffs(res);
-//     return 0;
-// }
-
-
 int main(int argc, char const *argv[])
 {
-    /*Var xx;
-    xx.makeInput();
-    xx=50;
-    Var f;
-    f =xx+xx;
-    f.result();
-    map<Var*, float> diffs = f.findDiff();
-    cout<<"f: "<<f.getVal()<<endl;
-    cout<<"xx: "<<xx.getVal()<<endl;
-    cout<<"diff xx:   "<<diffs.at(&xx)<<endl;
-
-    diffs = f.findDiff();
-    cout<<"f: "<<f.getVal()<<endl;
-    cout<<"xx: "<<xx.getVal()<<endl;
-
-    cout<<"diff xx:   "<<diffs.at(&xx)<<endl;
-    */
     clock_t t1 = clock();
     float x[] = {1.0, 2.0, 3.0, 4.0, 5.0};
     float y[] = {2.0, 5.0, 5.0, 8.0, 11.0};
@@ -180,6 +122,7 @@ int main(int argc, char const *argv[])
          err += pow((b0 + b1 * x[j] - y[j]),2)/2;
      }
     err = pow((b0 + b1 * x[1] - y[1]),2)/2 + pow((b0 + b1 * x[0] - y[0]),2)/2;
+    
     err.result();
     int i = 0;
     float val0 = 500000;
@@ -187,12 +130,10 @@ int main(int argc, char const *argv[])
 
     while(true){
         map<Var*, float> diffs = err.findDiff();
-        //cout<<"sdgdfgd"<<diffs.at(&b0)<<"  "<<diffs.at(&b1)<<endl;
         val0 = b0.getVal() - (float)(alpha * diffs.at(&b0));
         val1 = b1.getVal() - (float)(alpha * diffs.at(&b1));
         if (abs(b0.getVal() - val0) < 0.000001 && abs(b1.getVal() - val1) < 0.000001)
             break;
-        //cout<<abs(b0.getVal())<<"  "<<abs(b1.getVal())<<endl;
         b0 = val0;
         b1 = val1;
     }

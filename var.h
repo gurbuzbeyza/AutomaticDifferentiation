@@ -37,17 +37,14 @@ class Var {
     float findVals(Var* a, float left, float right);
     void calcDers(map<Var*,float>& derivs);
     map<Var*, float> calcDers(Var* v);
-    //map<Var*, float> calcDers(Var* v, map<Var*, float>& derivs,map<Var*, float> locDers);
     void findDers(Var* a);
     void topologicalSortUtil(Var* v);
-    // float solveLinEq(float& Jacobian[lenVars][lenVars], Var& n);
 public:
     static vector<Var*> nodes;
     static vector<Var*> sortedNodes;
     static set<Var*> inputs;
     Var(Operation operation=Operation::noop, tuple<Var*,Var*>* parents=new tuple<Var*,Var*>);
     ~Var();
-    // vector<tuple<Var,float>> GetCopyOfVector();
     void AddDer(Var* derOf,float der);
     void ClearDers();
     // void DisplayDerValues();
