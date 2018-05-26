@@ -1,2 +1,3 @@
 *.o
-valdi
+valdi.dylib
+a.out

@@ -482,7 +482,7 @@ map<Var*, float> Var::findDiff(){
 }
 
 string Var::toString(){
-    cout<<this->getVal()<<" ";
+    cout<<this<<" ";
     cout<<get<0>(parents)<<" ";
     cout<<get<1>(parents)<<" ";
 
