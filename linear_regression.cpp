@@ -1,52 +1,67 @@
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <list>
+#include <tuple>
 #include <math.h>
-#include <numeric>
+#include "valdi.h"
+#include <chrono>
 
 using namespace std;
 
-float sigmoid(float[] x){
-	float[sizeof(x)/sizeof(float)] sig;
-	for (int i = 0; i < sizeof(x)/sizeof(float); ++i)
+int main(int argc, char const *argv[])
+{
+	ifstream dataset("dataset");
+	ifstream label("label");
+	vector<float> X; 
+	vector<float> Y; 
+	float a;
+	while (dataset >> a)
 	{
-		sig[i] = 1/(1+exp(-x[i]));
+		X.push_back(a);
 	}
-	return sig;
-}
 
-float[] logistic_predictions(float weights[], float inputs[][] inputs){
-    # Outputs probability of a label being true according to logistic model.
-    return sigmoid(inner_product(begin(inputs), end(inputs), std::begin(weights), 0.0));
-}
+	while (label >> a)
+	{
+		Y.push_back(a);
+	}
 
-float training_loss(float weights[], float inputs[][] inputs){
-    # Training loss is the negative log-likelihood of the training labels.
-    preds = logistic_predictions(weights, inputs);
-    float label_probabilities[sizeof(preds)/sizeof(float)];
-    for (int i = 0; i < sizeof(preds)/sizeof(float); ++i)
+    auto start = std::chrono::high_resolution_clock::now();
+     
+    Var b0;
+    b0 = 0;
+    Var b1;
+    b1 = 0;
+    b0.makeInput();
+    b1.makeInput();
+    Var err;
+    err = 0;
+    float alpha = 0.00004;
+    for (int j = 0; j < 50; ++j)
     {
-    	label_probabilities[i] = preds[i]*targets[i] + (1 - preds[i]) * (1 - targets[i]);
+        err += pow((b0 + b1 * X[j] - Y[j]),2)/2;
     }
-    float sum = 0.0;
+    
+    err.result();
+    cout<<err.sortedNodes.size()<<endl;
+    float val0 = 500000;
+    float val1 = 500000;
 
-    for (int i = 0; i < sizeof(preds)/sizeof(float); ++i)
-    {
-    	sum += log(label_probabilities[i]);
+    for(int i = 0; i < 100000; i++){
+        map<Var*, float> diffs = err.findDiff();
+        val0 = b0.getVal() - (float)(alpha * diffs.at(&b0));
+        val1 = b1.getVal() - (float)(alpha * diffs.at(&b1));
+        if (abs(b0.getVal() - val0) < 0.0000001 && abs(b1.getVal() - val1) < 0.0000001)
+            break;
+        b0 = val0;
+        b1 = val1;
     }
-    return -sum;
-}
+    cout<<"afterdiff: \n"<<b0.getVal()<<" "<<b1.getVal()<<" "<<err.getVal()<<endl;
+    auto finish = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> elapsed = finish - start;
+	std::cout << "Elapsed time: " << elapsed.count() << " s\n";
 
-int main() {
-    float inputs[4][3] = {  
-		{0.52, 1.12,  0.77},
-        {0.88, -1.08, 0.15},
-        {0.52, 0.06, -1.30},
-        {0.74, -2.49, 1.39}   /*  initializers for row indexed by 2 */
-	};
-
-	bool targets[4] = {1, 1, 0, 1};
-
-	//training_gradient_fun = take gradient
-
-	float weights[3] = {0.0, 0.0, 0.0};
     return 0;
+
 }
