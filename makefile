@@ -1,10 +1,10 @@
 CC = g++ -std=c++11
 CFLAGS  = -g -Wall
 
-default: valdi.dylib
+default: valdi.so
 
-valdi.dylib:  valdi.o var.o solve.o
-	$(CC) $(CFLAGS) -dynamiclib -o valdi.dylib valdi.o var.o solve.o
+valdi.so:  valdi.o var.o solve.o
+	$(CC) $(CFLAGS) -dynamiclib -o valdi.so valdi.o var.o solve.o
 
 valdi.o:  valdi.cpp valdi.h var.h operation.h
 	$(CC) $(CFLAGS) -c valdi.cpp
