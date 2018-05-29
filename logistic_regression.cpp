@@ -27,38 +27,56 @@ int main() {
         weights[i].makeInput();
         weights[i] = 0;
     }
-
     for (int i = 0; i < 4; ++i)
     {
         Var* pred = new Var();
-        cout<<pred<<endl;
         *pred = 0;
+        Var *temp = new Var();
+        *temp = 0;
         for (int j = 0; j < 3; j++)
         {
-            *pred += 1/(1+exp(-inputs[i][j]*weights[j]));
+            *temp += inputs[i][j]*weights[j];
+
         }
-        sum += log(*pred*targets[i] + (1 - *pred) * (1 - targets[i]));
+        *pred = 1/(1+exp(-1*(*temp)));
+
+        sum -= log(*pred*targets[i] + (1 - *pred) * (1 - targets[i]));
     }
 
     sum.result();
-    cout<<sum.sortedNodes.size()<<endl;
+    // cout<<sum.sortedNodes.size()<<endl;
     bool isOk = false;
-    float alpha = 0.00001;
-    for(int i = 0; i < 100000; i++){
+    float alpha = 0.01;
+    int k = 0;
+    for(int i = 0; i < 100; i++){
+        k++;
         map<Var*, float> diffs = sum.findDiff();
         for (int i = 0; i < 3; ++i)
         {
-            cout<<i<<" "<<diffs.at(&weights[i])<<" ";
-            float val = weights[i].getVal();
-            weights[i] = weights[i].getVal() + (float)(alpha * diffs.at(&weights[i]));
-            if(abs(val - weights[i].getVal())<0.00001)
-                isOk = true;
-            else
-                isOk = false;
+            cout<<weights[i].getVal()<<" ";
         }
-        if (isOk)
+        cout<<sum.getVal()<<endl;;
+        for (int i = 0; i < 3; ++i)
+        {
+            float val = weights[i].getVal();
+            weights[i] = weights[i].getVal() - (float)(alpha * diffs.at(&weights[i]));
+            // if(abs(val - weights[i].getVal())<0.00001)
+            //     isOk = true;
+            // else
+            //     isOk = false;
+        }
+        // if (isOk)
+        //     break;
+        if (sum.getVal() != sum.getVal())
+        {
             break;
+        }
     }
-
+    cout<<k<<endl;
+    for (int i = 0; i < 3; ++i)
+    {
+        cout<<weights[i].getVal()<<" ";
+    }
+    cout<<sum.getVal()<<endl;
     return 0;
 }

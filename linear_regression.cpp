@@ -37,17 +37,19 @@ int main(int argc, char const *argv[])
     b1.makeInput();
     Var err;
     err = 0;
-    float alpha = 0.00004;
+    Var temp;
+    temp = 0;
+    float alpha = 0.01;
     for (int j = 0; j < 50; ++j)
     {
-        err += pow((b0 + b1 * X[j] - Y[j]),2)/2;
+        temp += pow((b0 + b1 * X[j] - Y[j]),2)/50;
     }
-    
+    err = sqrt(temp);
     err.result();
     cout<<err.sortedNodes.size()<<endl;
     float val0 = 500000;
     float val1 = 500000;
-
+    int k = 0;
     for(int i = 0; i < 100000; i++){
         map<Var*, float> diffs = err.findDiff();
         val0 = b0.getVal() - (float)(alpha * diffs.at(&b0));
@@ -56,7 +58,9 @@ int main(int argc, char const *argv[])
             break;
         b0 = val0;
         b1 = val1;
+        k++;
     }
+    cout<<"number of iterations: " << k<<endl;
     cout<<"afterdiff: \n"<<b0.getVal()<<" "<<b1.getVal()<<" "<<err.getVal()<<endl;
     auto finish = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> elapsed = finish - start;

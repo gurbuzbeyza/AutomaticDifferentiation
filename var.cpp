@@ -113,7 +113,7 @@ void Var::topologicalSortUtil(Var* v)
     if (get<0>(v->getParents()) != NULL && !get<0>(v->getParents())->isVisited())
         topologicalSortUtil(get<0>(v->getParents()));
     if (get<1>(v->getParents()) != NULL && !get<1>(v->getParents())->isVisited())
-        topologicalSortUtil(get<0>(v->getParents()));
+        topologicalSortUtil(get<1>(v->getParents()));
  
     // Push current vertex to stack which stores result
     this->sortedNodes.push_back(v);
@@ -326,6 +326,7 @@ float Var::findVals(Var* a, float left, float right){
 void Var::calcVals(){
     for (vector<Var*>::iterator i = this->sortedNodes.begin(); i != this->sortedNodes.end(); ++i){
         Var* a = *i;
+        // cout<<a->toString()<<" ";
         if (get<0>(a->getParents()) != NULL && get<1>(a->getParents()) != NULL)
         {
             a->setVal(findVals(a, get<0>(a->getParents())->getVal(), get<1>(a->getParents())->getVal()));
@@ -333,6 +334,7 @@ void Var::calcVals(){
         else if (get<0>(a->getParents()) != NULL && get<1>(a->getParents()) == NULL) {
            a->setVal(findVals(a, get<0>(a->getParents())->getVal(), -1)); 
         }
+        // cout<<a->getVal()<<endl;
     }
 }
 
@@ -397,7 +399,7 @@ void Var::findDers(Var* a){
                 a->AddDer(get<0>(a->getParents()), 0);
             }else{
                 a->AddDer(get<0>(a->getParents()), 1/get<1>(a->getParents())->getVal());
-                a->AddDer(get<1>(a->getParents()), (-1)*get<0>(a->getParents())->getVal()/(get<0>(a->getParents())->getVal()*get<0>(a->getParents())->getVal()));
+                a->AddDer(get<1>(a->getParents()), (-1)*get<0>(a->getParents())->getVal()/(get<1>(a->getParents())->getVal()*get<1>(a->getParents())->getVal()));
             }
             break;
         case Operation::sin :
@@ -471,6 +473,13 @@ map<Var*, float> Var::calcDers(Var* v){//base
     return newDers;
 }
 
+template <typename Enumeration>
+auto as_integer(Enumeration const value)
+    -> typename std::underlying_type<Enumeration>::type
+{
+    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
+}
+
 
 
 map<Var*, float> Var::findDiff(){
@@ -485,6 +494,6 @@ string Var::toString(){
     cout<<this<<" ";
     cout<<get<0>(parents)<<" ";
     cout<<get<1>(parents)<<" ";
-
+    cout<<as_integer(this->operation)<<" ";
     return to_string(this->getVal());
 }
