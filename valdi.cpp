@@ -32,6 +32,9 @@ Var&makeUnaryOperation(const Var& var, Operation op){
 Var& sqrt(const Var& var)
 {    return makeUnaryOperation(var,Operation::sqrt);    }
 
+Var& sig(const Var& var)
+{    return makeUnaryOperation(var,Operation::sig);    }
+
 Var& sin(const Var& var)
 {   return makeUnaryOperation(var,Operation::sin);  }
 
