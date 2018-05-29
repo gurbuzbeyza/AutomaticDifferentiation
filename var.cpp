@@ -299,6 +299,8 @@ float Var::findVals(Var* a, float left, float right){
             return (left * right);
         case Operation::divd :
             return (left / right);
+        case Operation::sig :
+            return (exp(left)/(1+exp(left)));
         case Operation::sin :
             return (sin(left));
         case Operation::cos :
@@ -407,6 +409,9 @@ void Var::findDers(Var* a){
                 a->AddDer(get<0>(a->getParents()), 1/get<1>(a->getParents())->getVal());
                 a->AddDer(get<1>(a->getParents()), (-1)*get<0>(a->getParents())->getVal()/(get<1>(a->getParents())->getVal()*get<1>(a->getParents())->getVal()));
             }
+            break;
+        case Operation::sig :
+            a->AddDer(get<0>(a->getParents()), (exp(get<0>(a->getParents())->getVal())/(1+exp(get<0>(a->getParents())->getVal())))*(1-exp(get<0>(a->getParents())->getVal())/(1+exp(get<0>(a->getParents())->getVal()))));
             break;
         case Operation::sin :
             a->AddDer(get<0>(a->getParents()), cos(get<0>(a->getParents())->getVal()));

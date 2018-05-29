@@ -13,6 +13,7 @@ Var& pow(const Var& var, const Var& p);
 Var& pow(const Var& var, float p);
 Var&makeUnaryOperation(const Var& var, Operation op);
 Var& sqrt(const Var& var);
+Var& sig(const Var& var);
 Var& sin(const Var& var);
 Var& cos(const Var& var);
 Var& tan(const Var& var);
