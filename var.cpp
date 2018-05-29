@@ -311,6 +311,12 @@ float Var::findVals(Var* a, float left, float right){
             return (acos(left));
         case Operation::atan :
             return (atan(left));
+        case Operation::sinh :
+            return (sinh(left));
+        case Operation::cosh :
+            return (cosh(left));
+        case Operation::tanh :
+            return (tanh(left));
         case Operation::exp :
             return (exp(left));
         case Operation::log :
@@ -407,7 +413,7 @@ void Var::findDers(Var* a){
             a->AddDer(get<0>(a->getParents()), -sin(get<0>(a->getParents())->getVal()));
             break;
         case Operation::tan :
-            a->AddDer(get<0>(a->getParents()), 1/(cos(get<0>(a->getParents())->getVal())*get<0>(a->getParents())->getVal()));
+            a->AddDer(get<0>(a->getParents()), 1/(cos(get<0>(a->getParents())->getVal())*cos(get<0>(a->getParents())->getVal())));
             break;
         case Operation::asin :
             a->AddDer(get<0>(a->getParents()), 1/sqrt(1-get<0>(a->getParents())->getVal()*get<0>(a->getParents())->getVal()));
@@ -417,6 +423,15 @@ void Var::findDers(Var* a){
             break;
         case Operation::atan :
             a->AddDer(get<0>(a->getParents()), 1/(get<0>(a->getParents())->getVal()*get<0>(a->getParents())->getVal()+1));
+            break;
+        case Operation::sinh :
+            a->AddDer(get<0>(a->getParents()), cosh(get<0>(a->getParents())->getVal()));
+            break;
+        case Operation::cosh :
+            a->AddDer(get<0>(a->getParents()), sinh(get<0>(a->getParents())->getVal()));
+            break;
+        case Operation::tanh :
+            a->AddDer(get<0>(a->getParents()), 1/(cosh(get<0>(a->getParents())->getVal())*cosh(get<0>(a->getParents())->getVal())));
             break;
         case Operation::exp :
             a->AddDer(get<0>(a->getParents()), exp(get<0>(a->getParents())->getVal()));
