@@ -1,1 +1,0 @@
-enum class Operation {add, sub, mult, divd, sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, exp, log, pow, sqrt, sig, noop};
