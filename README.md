@@ -47,7 +47,7 @@ res=(a*b)+3*b;
 res.result();
 ```
 
-5. After that, you can find differantial of `res` with respect to inputs with different numerical values. Call `findDiff` function and assign it to a `map<Var*, float>`.
+5. After that, you can find differential of `res` with respect to inputs with different numerical values. Call `findDiff` function and assign it to a `map<Var*, float>`.
 
 ```cpp
 a = 5;
